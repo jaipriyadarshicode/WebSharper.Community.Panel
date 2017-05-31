@@ -10,39 +10,56 @@ open WebSharper.UI.Next.Input
 [<JavaScript>]
 module Library = 
 
-        let mouseOverVar = Var.Create false
-        let leftOffset = Var.Create 0
-        let topOffset = Var.Create 0
-        let leftPosParVar = Var.Create 0
-        let lastLeft = Var.Create 0
-        let lastTop = Var.Create 0
-        let minX=Var.Create 0
-        let maxX=Var.Create 0
-        let minY=Var.Create 0
-        let maxY=Var.Create 0
-        let mapDragActive=View.Map (fun (v) -> Console.Log ("In mapDragActive Last left:"+lastLeft.Value.ToString())
-                                               v && mouseOverVar.Value) Mouse.LeftPressed
-        let lastHeldPos = View.UpdateWhile (0,0) mapDragActive Mouse.Position
-        let toLocal = lastHeldPos.Map (fun (x,y)->
-                                                  let xPos=min maxX.Value (max minX.Value (x - leftOffset.Value))
-                                                  let yPos=min maxY.Value (max minY.Value (y - topOffset.Value))
-                                                  lastLeft.Value <- xPos
-                                                  lastTop.Value <- yPos
-                                                  Console.Log ("Last left:"+lastLeft.Value.ToString())
+    type PanelInstance =
+        {
+            mouseOverVar:Var<bool>
+            leftOffset:Var<int>
+            topOffset:Var<int>
+            leftPosParVar:Var<int>
+            lastLeft:Var<int>
+            lastTop:Var<int>
+            minX:Var<int>
+            maxX:Var<int>
+            minY:Var<int>
+            maxY:Var<int>
+        }
+        static member Create =
+            {   
+                mouseOverVar = Var.Create false
+                leftOffset = Var.Create 0
+                topOffset = Var.Create 0
+                leftPosParVar = Var.Create 0
+                lastLeft = Var.Create 0
+                lastTop = Var.Create 0
+                minX=Var.Create 0
+                maxX=Var.Create 0
+                minY=Var.Create 0
+                maxY=Var.Create 0
+            }
+        member x.mapDragActive=View.Map (fun (v) -> 
+                                                  Console.Log ("In mapDragActive Last left:"+x.lastLeft.Value.ToString())
+                                                  v && x.mouseOverVar.Value) Mouse.LeftPressed
+        member x.lastHeldPos = View.UpdateWhile (0,0) x.mapDragActive Mouse.Position
+        member x.toLocal = x.lastHeldPos.Map (fun (x_cor,y_cor)->
+                                                  let xPos=min x.maxX.Value (max x.minX.Value (x_cor - x.leftOffset.Value))
+                                                  let yPos=min x.maxY.Value (max x.minY.Value (y_cor - x.topOffset.Value))
+                                                  x.lastLeft.Value <- xPos
+                                                  x.lastTop.Value <- yPos
+                                                  Console.Log ("Last left:"+x.lastLeft.Value.ToString())
                                                   (xPos,yPos))
 
-        let panelAttr pannelAttrs titleAttrs titleContent childContent=
+        member x.panelAttr pannelAttrs titleAttrs titleContent childContent=
             let titleAttrsUpdated = Seq.concat [
                                         titleAttrs
                                         [
-                                            on.mouseOver  (fun _ _ -> mouseOverVar.Value<-true)
-                                            on.mouseLeave (fun _ _ -> mouseOverVar.Value<-false)
+                                            on.mouseOver  (fun _ _ -> x.mouseOverVar.Value<-true)
+                                            on.mouseLeave (fun _ _ -> x.mouseOverVar.Value<-false)
                                             on.mouseDown  (fun (elm:Dom.Element) evnt ->
-                                                                        leftOffset.Value <- evnt.ClientX - lastLeft.Value
-                                                                        topOffset.Value <- evnt.ClientY - lastTop.Value
+                                                                        x.leftOffset.Value <- evnt.ClientX - x.lastLeft.Value
+                                                                        x.topOffset.Value <- evnt.ClientY - x.lastTop.Value
                                                                         //Console.Log ("Width: "+elm.ParentElement.ParentElement.GetBoundingClientRect().Width.ToString())
-                                                                        maxX.Value <- (int)(elm.ParentElement.ParentElement.GetBoundingClientRect().Width-elm.ParentElement.GetBoundingClientRect().Width)
-                                                                        maxY.Value <- (int)(elm.ParentElement.ParentElement.GetBoundingClientRect().Height-elm.ParentElement.GetBoundingClientRect().Height))
+                                                                        x.maxX.Value <- (int)(elm.ParentElement.ParentElement.GetBoundingClientRect().Width-elm.ParentElement.GetBoundingClientRect().Width)
+                                                                        x.maxY.Value <- (int)(elm.ParentElement.ParentElement.GetBoundingClientRect().Height-elm.ParentElement.GetBoundingClientRect().Height))
                                             on.mouseMove  (fun _ evnt -> Console.Log ("on.mouseMove:"+evnt.Button.ToString()))                                        
                                         ]|>Seq.ofList
                                    ]
@@ -51,8 +68,8 @@ module Library =
                          pannelAttrs
                          [
                              Attr.Style "position" "relative"
-                             Attr.DynamicStyle "left" (View.Map (fun (x,y) -> sprintf "%dpx" x) toLocal)
-                             Attr.DynamicStyle "top"  (View.Map (fun (x,y) -> sprintf "%dpx" y) toLocal)
+                             Attr.DynamicStyle "left" (View.Map (fun (x,y) -> sprintf "%dpx" x) x.toLocal)
+                             Attr.DynamicStyle "top"  (View.Map (fun (x,y) -> sprintf "%dpx" y) x.toLocal)
                          ]|>Seq.ofList
                      ]
             divAttr

@@ -120,13 +120,13 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
-  <Import Project="..\packages\Zafir.FSharp.4.0.160.40-beta6\build\Zafir.FSharp.targets" Condition="Exists('..\packages\Zafir.FSharp.4.0.160.40-beta6\build\Zafir.FSharp.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Zafir.FSharp.4.0.160.40-beta6\build\Zafir.FSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zafir.FSharp.4.0.160.40-beta6\build\Zafir.FSharp.targets'))" />
     <Error Condition="!Exists('..\packages\Zafir.UI.Next.4.0.134.36-beta6\build\Zafir.UI.Next.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zafir.UI.Next.4.0.134.36-beta6\build\Zafir.UI.Next.targets'))" />
+    <Error Condition="!Exists('..\packages\Zafir.FSharp.4.0.161.45-beta6\build\Zafir.FSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zafir.FSharp.4.0.161.45-beta6\build\Zafir.FSharp.targets'))" />
   </Target>
   <Import Project="..\packages\Zafir.UI.Next.4.0.134.36-beta6\build\Zafir.UI.Next.targets" Condition="Exists('..\packages\Zafir.UI.Next.4.0.134.36-beta6\build\Zafir.UI.Next.targets')" />
+  <Import Project="..\packages\Zafir.FSharp.4.0.161.45-beta6\build\Zafir.FSharp.targets" Condition="Exists('..\packages\Zafir.FSharp.4.0.161.45-beta6\build\Zafir.FSharp.targets')" />
 </Project>
