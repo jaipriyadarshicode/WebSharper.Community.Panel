@@ -52,6 +52,7 @@ module Library =
             let titleAttrsUpdated = Seq.concat [
                                         titleAttrs
                                         [
+                                            Attr.Style "cursor" "grab"
                                             on.mouseOver  (fun _ _ -> x.mouseOverVar.Value<-true)
                                             on.mouseLeave (fun _ _ -> x.mouseOverVar.Value<-false)
                                             on.mouseDown  (fun (elm:Dom.Element) evnt ->
@@ -67,7 +68,7 @@ module Library =
                     Seq.concat [
                          pannelAttrs
                          [
-                             Attr.Style "position" "relative"
+                             Attr.Style "position" "absolute"
                              Attr.DynamicStyle "left" (View.Map (fun (x,y) -> sprintf "%dpx" x) x.toLocal)
                              Attr.DynamicStyle "top"  (View.Map (fun (x,y) -> sprintf "%dpx" y) x.toLocal)
                          ]|>Seq.ofList
