@@ -57,7 +57,17 @@ module Client =
             (haItem.panel.panelAttr
                     [Attr.Style "Width" "150px"]
                     [Attr.Class "panelTitle"]
-                    [text haItem.name]
+                    [tableAttr [Attr.Style "width" "100%"]
+                         [tr[
+                            td[text haItem.name]
+                            tdAttr[Attr.Style "text-align" "right"]
+                              [iAttr[Attr.Class "material-icons orange600"
+                                     Attr.Style "cursor" "pointer"
+                                     on.mouseDown (fun _ _->panelItems.PanelItems.Remove(haItem)
+                                                            )][text "clear"]
+                                                                  ]
+                            ]]
+                    ]
                     (divAttr
                         [Attr.Class "panelContent"]
                         [text "Content"])).OnAfterRender((fun el -> 
