@@ -13,55 +13,78 @@ module Library =
     type PanelInstance =
         {
             mouseOverVar:Var<bool>
-            leftOffset:Var<int>
-            topOffset:Var<int>
-            leftPosParVar:Var<int>
-            lastLeft:Var<int>
-            lastTop:Var<int>
-            minX:Var<int>
-            maxX:Var<int>
-            minY:Var<int>
-            maxY:Var<int>
+            mouseDownVar:Var<bool>
+            leftOffset:Var<double>
+            topOffset:Var<double>
+            lastLeft:Var<double>
+            lastTop:Var<double>
+            element:Var<Dom.Element>
         }
-        static member Create =
+        static member Create=
             {   
                 mouseOverVar = Var.Create false
-                leftOffset = Var.Create 0
-                topOffset = Var.Create 0
-                leftPosParVar = Var.Create 0
-                lastLeft = Var.Create 0
-                lastTop = Var.Create 0
-                minX=Var.Create 0
-                maxX=Var.Create 0
-                minY=Var.Create 0
-                maxY=Var.Create 0
+                mouseDownVar = Var.Create false
+                leftOffset = Var.Create 0.0
+                topOffset = Var.Create 0.0
+                lastLeft = Var.Create 0.0
+                lastTop = Var.Create 0.0
+                element=Var.Create ((div[]).Dom)
             }
-        member x.mapDragActive=View.Map (fun (v) -> 
-                                                  Console.Log ("In mapDragActive Last left:"+x.lastLeft.Value.ToString())
-                                                  v && x.mouseOverVar.Value) Mouse.LeftPressed
-        member x.lastHeldPos = View.UpdateWhile (0,0) x.mapDragActive Mouse.Position
-        member x.toLocal = x.lastHeldPos.Map (fun (x_cor,y_cor)->
-                                                  let xPos=min x.maxX.Value (max x.minX.Value (x_cor - x.leftOffset.Value))
-                                                  let yPos=min x.maxY.Value (max x.minY.Value (y_cor - x.topOffset.Value))
-                                                  x.lastLeft.Value <- xPos
-                                                  x.lastTop.Value <- yPos
-                                                  Console.Log ("Last left:"+x.lastLeft.Value.ToString())
-                                                  (xPos,yPos))
+
 
         member x.panelAttr pannelAttrs titleAttrs titleContent childContent=
+            let mapDragActive=View.Map (fun (v) ->    let condition = v && x.mouseOverVar.Value
+                                                      //Console.Log ("In mapDragActive Last left:"+condition.ToString())
+                                                      condition) Mouse.LeftPressed
+            let lastHeldPos = View.UpdateWhile (0,0) mapDragActive Mouse.Position
+            let toLocal = lastHeldPos.Map (fun (x_cor,y_cor)->
+                                                      if x.element.Value.ParentElement <> null && x.element.Value.ParentElement.ParentElement <> null then 
+                                                          let domRectParent = x.element.Value.ParentElement.GetBoundingClientRect()
+                                                          let domRectParentParent = x.element.Value.ParentElement.ParentElement.GetBoundingClientRect()
+                                                          let maxX = domRectParentParent.Width-domRectParent.Width
+                                                          let maxY =  domRectParentParent.Height-domRectParent.Height
+                                                          let xPos=min maxX (max 0.0 ((double)x_cor - x.leftOffset.Value))
+                                                          let yPos=min maxY (max 0.0 ((double)y_cor - x.topOffset.Value))
+                                                          x.lastLeft.Value <- xPos
+                                                          x.lastTop.Value <- yPos
+                                                          //Console.Log ("Last left:"+x.lastLeft.Value.ToString())
+                                                          (xPos,yPos)
+                                                      else
+                                                          (0.0,0.0)
+                                                      )
             let titleAttrsUpdated = Seq.concat [
                                         titleAttrs
                                         [
                                             Attr.Style "cursor" "grab"
-                                            on.mouseOver  (fun _ _ -> x.mouseOverVar.Value<-true)
+                                            on.mouseEnter  (fun _ _ -> 
+                                                  //Console.Log ("mouseEnter")
+                                                  x.mouseOverVar.Value<-true)
                                             on.mouseLeave (fun _ _ -> x.mouseOverVar.Value<-false)
+                                            on.mouseUp (fun _ _ -> x.mouseDownVar.Value<-false)
                                             on.mouseDown  (fun (elm:Dom.Element) evnt ->
-                                                                        x.leftOffset.Value <- evnt.ClientX - x.lastLeft.Value
-                                                                        x.topOffset.Value <- evnt.ClientY - x.lastTop.Value
+                                                                        x.mouseDownVar.Value <-true
+                                                                        x.leftOffset.Value <- (double)evnt.ClientX - x.lastLeft.Value
+                                                                        x.topOffset.Value <- (double)evnt.ClientY - x.lastTop.Value
+                                                                        //Console.Log ("mouseDown")
                                                                         //Console.Log ("Width: "+elm.ParentElement.ParentElement.GetBoundingClientRect().Width.ToString())
-                                                                        x.maxX.Value <- (int)(elm.ParentElement.ParentElement.GetBoundingClientRect().Width-elm.ParentElement.GetBoundingClientRect().Width)
-                                                                        x.maxY.Value <- (int)(elm.ParentElement.ParentElement.GetBoundingClientRect().Height-elm.ParentElement.GetBoundingClientRect().Height))
-                                            on.mouseMove  (fun _ evnt -> Console.Log ("on.mouseMove:"+evnt.Button.ToString()))                                        
+                                                                        //x.maxX.Value <- (elm.ParentElement.ParentElement.GetBoundingClientRect().Width-elm.ParentElement.GetBoundingClientRect().Width)
+                                                                        //x.maxY.Value <- (elm.ParentElement.ParentElement.GetBoundingClientRect().Height-elm.ParentElement.GetBoundingClientRect().Height)
+                                                                        )
+                                            on.mouseMove  (fun _ evnt -> 
+                                                              if x.mouseDownVar.Value && x.element.Value.ParentElement <> null && x.element.Value.ParentElement.ParentElement <> null then 
+                                                                  let x_cor = evnt.ClientX
+                                                                  let y_cor = evnt.ClientY
+                                                                  //Console.Log ("on.mouseMove:"+evnt.Button.ToString() + " " + x_cor.ToString())
+                                                                  let domRectParent = x.element.Value.GetBoundingClientRect()
+                                                                  let domRectParentParent = x.element.Value.ParentElement.GetBoundingClientRect()
+                                                                  let maxX = domRectParentParent.Width-domRectParent.Width
+                                                                  let maxY =  domRectParentParent.Height-domRectParent.Height
+                                                                  let xPos=min maxX (max 0.0 ((double)x_cor - x.leftOffset.Value))
+                                                                  let yPos=min maxY (max 0.0 ((double)y_cor - x.topOffset.Value))
+                                                                  x.lastLeft.Value <- xPos
+                                                                  x.lastTop.Value <- yPos
+                                                                  //Console.Log ("Last left:"+x.lastLeft.Value.ToString())
+                                                          )                                        
                                         ]|>Seq.ofList
                                    ]
             let panelAttrsUpdated = 
@@ -69,13 +92,26 @@ module Library =
                          pannelAttrs
                          [
                              Attr.Style "position" "absolute"
-                             Attr.DynamicStyle "left" (View.Map (fun (x,y) -> sprintf "%dpx" x) x.toLocal)
-                             Attr.DynamicStyle "top"  (View.Map (fun (x,y) -> sprintf "%dpx" y) x.toLocal)
+                             Attr.DynamicStyle "left" (View.Map (fun (x) -> 
+                                                               Console.Log "x from lastLeft"
+                                                               sprintf "%fpx" x) x.lastLeft.View)
+                             Attr.DynamicStyle "top"  (View.Map (fun (y) -> sprintf "%fpx" y)  x.lastTop.View)
+            (*                 Attr.DynamicStyle "left" (View.Map (fun (x,y) -> 
+                                                               Console.Log "x from moveTo"
+                                                               sprintf "%fpx" x) x.moveTo.View) *)
+                  (*            Attr.DynamicStyle "top"  (View.Map (fun (x,y) -> sprintf "%fpx" y) x.moveTo.View)
+                            Attr.DynamicStyle "left" (View.Map (fun (x,y) -> 
+                                                               Console.Log "x from toLocal"
+                                                               sprintf "%fpx" x) toLocal) 
+                             Attr.DynamicStyle "top"  (View.Map (fun (x,y) -> sprintf "%fpx" y) toLocal) *)
                          ]|>Seq.ofList
                      ]
-            divAttr
-                 panelAttrsUpdated
-                 [
-                     divAttr titleAttrsUpdated titleContent
-                     childContent
-                 ]
+            let resDiv = 
+                divAttr
+                     panelAttrsUpdated
+                     [
+                         divAttr titleAttrsUpdated titleContent
+                         childContent
+                     ]
+            x.element.Value <- resDiv.Dom
+            resDiv

@@ -6,6 +6,7 @@ open WebSharper.UI.Next
 open WebSharper.UI.Next.Client
 open WebSharper.UI.Next.Html
 open WebSharper.Community.Panel.Library
+open WebSharper.Community.Panel.Rect.Library
 
 [<JavaScript>]
 module Client =
@@ -15,8 +16,6 @@ module Client =
             Key:Key
             z_index : int
             name : string
-            left :Var<double>
-            top : Var<double>
             panel:PanelInstance
         }
         static member Create name z_index=
@@ -24,27 +23,74 @@ module Client =
                 Key=Key.Fresh()
                 name = name
                 z_index = z_index
-                left = Var.Create 0.0
-                top = Var.Create 0.0
                 panel = PanelInstance.Create
             }
     type PanelModel =
         {
             PanelItems : ListModel<Key,PanelItem>
         }
-    let RenderPanelItem (haItem:PanelItem) =      
-            haItem.panel.panelAttr
+    let panelItems=  { PanelItems = ListModel.Create (fun item ->item.Key) [] }
+    let collectFreeSpace (rcContainer:Rect) (except:PanelItem)= 
+                                              panelItems.PanelItems
+                                              |>List.ofSeq 
+                                              |>List.filter (fun item -> item.Key <> except.Key)
+                                              |>List.fold (fun (acc:Rect list) panel -> 
+                                                                      let rcPanel = ((Rect.fromDomRect panel.panel.element.Value)
+                                                                                      .offset panel.panel.lastLeft.Value panel.panel.lastTop.Value)
+                                                                                      .inflate 5.0 5.0
+                                                                      Console.Log ("collectFreeSpace: " + rcPanel.ToString())   
+                                                                      let rcTop = {left = 0.0; right = rcContainer.right; top = 0.0; bottom = rcPanel.top }
+                                                                      let rcLeft = {left = 0.0; right = rcPanel.left; top = rcPanel.top; bottom = rcPanel.bottom }
+                                                                      rcTop::rcLeft
+                                                                      ::{rcLeft with left = rcPanel.right; right = rcContainer.right}
+                                                                      ::{rcTop with top = rcPanel.bottom; bottom = rcContainer.bottom}::[]
+                                                                      |>List.map (fun rc -> acc |> List.map (fun accRc -> accRc.intersect rc) 
+                                                                                                |> List.filter (fun accRect -> 
+                                                                                                                     Console.Log ("filter: " + accRect.ToString())   
+                                                                                                                     not accRect.isEmpty ))
+                                                                      |>List.concat
+                                                                      ) [rcContainer]
+
+    let RenderPanelItem (haItem:PanelItem) =     
+        let newPanel = 
+            (haItem.panel.panelAttr
                     [Attr.Style "Width" "150px"]
                     [Attr.Class "panelTitle"]
                     [text haItem.name]
                     (divAttr
                         [Attr.Class "panelContent"]
-                        [text "Content"])
-    let panelItems=  { PanelItems = ListModel.Create (fun item ->item.Key) [] }
+                        [text "Content"])).OnAfterRender((fun el -> 
+                            let rcPanel=Rect.fromDomRect el
+                            let rcContainer = Rect.fromDomRect el.ParentElement
+                            Console.Log ("Add panel: " + rcPanel.ToString() + " " + rcContainer.ToString())       
+                            let foundCandidate=
+                                collectFreeSpace rcContainer haItem
+                                |>List.tryFind (fun rc -> 
+                                          Console.Log ("Finds free rect: " + rc.ToString())             
+                                          rc.width >= rcPanel.width && rc.height >= rcPanel.height)
+                            match foundCandidate with 
+                            |None->()
+                            |Some(rc)->
+                                  haItem.panel.lastLeft.Value <- rc.left + 5.0
+                                  haItem.panel.lastTop.Value <- rc.top + 5.0
+                                 // haItem.panel.moveTo.Value <- (rc.left,rc.top)
+ 
+                        
+                        ))
+        newPanel
+
     let Main () =
         let listPanels=
                     ListModel.View panelItems.PanelItems
                     |> Doc.BindSeqCachedBy (fun m -> m.Key) (RenderPanelItem)
+        let panelContainer = 
+                        divAttr[ Attr.Style "border" "1px solid white"
+                                 Attr.Style "Width" "800px"
+                                 Attr.Style "Height" "400px"
+                                 Attr.Style "left" "0px"
+                                 Attr.Style "top" "0px"
+                                 Attr.Style "position" "relative"
+                        ][listPanels]
         div [
             table[
                 tr[
@@ -68,13 +114,7 @@ module Client =
                              ]
                       ]
                     td[
-                        divAttr[ Attr.Style "border" "1px solid white"
-                                 Attr.Style "Width" "800px"
-                                 Attr.Style "Height" "400px"
-                                 Attr.Style "left" "0px"
-                                 Attr.Style "top" "0px"
-                                 Attr.Style "position" "relative"
-                        ][listPanels]
+                         panelContainer
                       ]
                   ]
             ]

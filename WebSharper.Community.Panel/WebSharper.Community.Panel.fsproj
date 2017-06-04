@@ -49,6 +49,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="Panel.fs" />
+    <Compile Include="Rect.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
