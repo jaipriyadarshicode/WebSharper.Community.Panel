@@ -14,6 +14,9 @@ type Rect =
     static member fromDomRect (elem:Dom.Element) = 
         let domRc=elem.GetBoundingClientRect()
         {left=0.0;top=0.0;right=domRc.Width;bottom=domRc.Height}
+    static member fromPanel (panel:Panel) = 
+        (Rect.fromDomRect panel.element.Value)
+         .offset panel.lastLeft.Value panel.lastTop.Value       
     member x.isEmpty = x.left >= x.right || x.top >= x.bottom
     member x.offset x_offset y_offset ={left=x.left+x_offset;top = x.top + y_offset;right=x.right+x_offset;bottom=x.bottom+y_offset}
     member x.intersect rect:Rect =

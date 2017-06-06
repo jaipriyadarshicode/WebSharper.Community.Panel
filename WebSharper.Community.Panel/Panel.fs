@@ -17,8 +17,9 @@ type Panel =
         lastLeft:Var<double>
         lastTop:Var<double>
         element:Var<Dom.Element>
+        arrangePanels:Panel->unit
     }
-    static member Create=
+    static member Create arrangePanels=
         {   
             mouseOverVar = Var.Create false
             mouseDownVar = Var.Create false
@@ -27,6 +28,7 @@ type Panel =
             lastLeft = Var.Create 0.0
             lastTop = Var.Create 0.0
             element=Var.Create ((div[]).Dom)
+            arrangePanels = arrangePanels
         }
 
 
@@ -64,6 +66,8 @@ type Panel =
                                                               let yPos=min maxY (max 0.0 ((double)y_cor - x.topOffset.Value))
                                                               x.lastLeft.Value <- xPos
                                                               x.lastTop.Value <- yPos
+                                                              x.arrangePanels x
+                                                              //evnt.StopPropagation()
                                                               //Console.Log ("Last left:"+x.lastLeft.Value.ToString())
                                                       )                                        
                                     ]|>Seq.ofList
