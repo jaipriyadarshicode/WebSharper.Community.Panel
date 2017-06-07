@@ -1,7 +1,7 @@
 (function()
 {
  "use strict";
- var Global,WebSharper,Community,Panel,Panel$1,Rect,PanelItem,PanelContainer,IntelliFactory,Runtime,Seq,List,UI,Next,AttrModule,Var,Unchecked,Operators,View,Doc,Key,ListModel;
+ var Global,WebSharper,Community,Panel,Panel$1,Rect,PanelItem,PanelContainer,IntelliFactory,Runtime,UI,Next,Var,Seq,List,AttrModule,Unchecked,Operators,View,Doc,Key,ListModel;
  Global=window;
  WebSharper=Global.WebSharper=Global.WebSharper||{};
  Community=WebSharper.Community=WebSharper.Community||{};
@@ -12,12 +12,12 @@
  PanelContainer=Panel.PanelContainer=Panel.PanelContainer||{};
  IntelliFactory=Global.IntelliFactory;
  Runtime=IntelliFactory&&IntelliFactory.Runtime;
- Seq=WebSharper&&WebSharper.Seq;
- List=WebSharper&&WebSharper.List;
  UI=WebSharper&&WebSharper.UI;
  Next=UI&&UI.Next;
- AttrModule=Next&&Next.AttrModule;
  Var=Next&&Next.Var;
+ Seq=WebSharper&&WebSharper.Seq;
+ List=WebSharper&&WebSharper.List;
+ AttrModule=Next&&Next.AttrModule;
  Unchecked=WebSharper&&WebSharper.Unchecked;
  Operators=WebSharper&&WebSharper.Operators;
  View=Next&&Next.View;
@@ -25,60 +25,57 @@
  Key=Next&&Next.Key;
  ListModel=Next&&Next.ListModel;
  Panel$1=Panel.Panel=Runtime.Class({
-  panelAttr:function(pannelAttrs,titleAttrs,titleContent,childContent)
+  get_panelAttr:function()
   {
-   var $this,titleAttrsUpdated,panelAttrsUpdated,a,a$1,resDiv,a$2,a$3,a$4;
+   var $this,dragActive,mouseOverVar,leftOffset,topOffset,titleAttrsUpdated,panelAttrsUpdated,a,a$1,resDiv,a$2,a$3,a$4,a$5;
    $this=this;
-   titleAttrsUpdated=Seq.concat([titleAttrs,List.ofArray([AttrModule.Style("cursor","grab"),AttrModule.Handler("mouseenter",function()
+   dragActive=Var.Create$1(false);
+   mouseOverVar=Var.Create$1(false);
+   leftOffset=Var.Create$1(0);
+   topOffset=Var.Create$1(0);
+   titleAttrsUpdated=Seq.concat([this.titleAttrs,List.ofArray([AttrModule.Style("cursor","grab"),AttrModule.Handler("mouseenter",function()
    {
     return function()
     {
-     var a$5;
-     a$5=$this.mouseOverVar;
-     return Var.Set(a$5,true);
+     return Var.Set(mouseOverVar,true);
     };
    }),AttrModule.Handler("mouseleave",function()
    {
     return function()
     {
-     var a$5;
-     a$5=$this.mouseOverVar;
-     return Var.Set(a$5,false);
+     return!dragActive.c?Var.Set(mouseOverVar,false):null;
     };
    }),AttrModule.Handler("mouseup",function()
    {
     return function()
     {
-     var a$5;
-     a$5=$this.mouseDownVar;
-     return Var.Set(a$5,false);
+     Var.Set(mouseOverVar,false);
+     return Var.Set(dragActive,false);
     };
    }),AttrModule.Handler("mousedown",function()
    {
     return function(evnt)
     {
-     var a$5,a$6,a$7,a$8,a$9;
-     a$5=$this.mouseDownVar;
-     Var.Set(a$5,true);
-     a$6=$this.leftOffset;
-     a$7=+evnt.clientX-$this.lastLeft.c;
-     Var.Set(a$6,a$7);
-     a$8=$this.topOffset;
-     a$9=+evnt.clientY-$this.lastTop.c;
-     return Var.Set(a$8,a$9);
+     var a$6,a$7;
+     mouseOverVar.c?Var.Set(dragActive,true):void 0;
+     a$6=+evnt.clientX-$this.left.c;
+     Var.Set(leftOffset,a$6);
+     a$7=+evnt.clientY-$this.top.c;
+     return Var.Set(topOffset,a$7);
     };
    }),AttrModule.Handler("mousemove",function()
    {
     return function(evnt)
     {
-     var x_cor,y_cor,domRectParent,domRectParentParent,maxX,maxY,xPos,yPos,a$5,a$6;
-     return((($this.mouseDownVar.c?$this.mouseOverVar.c:false)?!Unchecked.Equals($this.element.c.parentElement,null):false)?!Unchecked.Equals($this.element.c.parentElement.parentElement,null):false)?(x_cor=evnt.clientX,(y_cor=evnt.clientY,(domRectParent=$this.element.c.getBoundingClientRect(),(domRectParentParent=$this.element.c.parentElement.getBoundingClientRect(),(maxX=domRectParentParent.width-domRectParent.width,(maxY=domRectParentParent.height-domRectParent.height,(xPos=Operators.Min(maxX,Operators.Max(0,+x_cor-$this.leftOffset.c)),(yPos=Operators.Min(maxY,Operators.Max(0,+y_cor-$this.topOffset.c)),(a$5=$this.lastLeft,Var.Set(a$5,xPos),a$6=$this.lastTop,Var.Set(a$6,yPos),$this.arrangePanels($this)))))))))):null;
+     var a$6,c,c$1,x_cor,y_cor,domRectParent,domRectParentParent,maxX,maxY,xPos,yPos,a$7,a$8;
+     a$6="on.mouseMove:"+(c=evnt.button,Global.String(c))+" "+(c$1=evnt.clientX,Global.String(c$1));
+     Global.console.log(a$6);
+     return((dragActive.c?!Unchecked.Equals($this.element.c.parentElement,null):false)?!Unchecked.Equals($this.element.c.parentElement.parentElement,null):false)?(x_cor=evnt.clientX,(y_cor=evnt.clientY,(domRectParent=$this.element.c.getBoundingClientRect(),(domRectParentParent=$this.element.c.parentElement.getBoundingClientRect(),(maxX=domRectParentParent.width-domRectParent.width,(maxY=domRectParentParent.height-domRectParent.height,(xPos=Operators.Min(maxX,Operators.Max(0,+x_cor-leftOffset.c)),(yPos=Operators.Min(maxY,Operators.Max(0,+y_cor-topOffset.c)),(a$7=$this.left,Var.Set(a$7,xPos),a$8=$this.top,Var.Set(a$8,yPos),$this.arrangePanels($this)))))))))):null;
     };
    })])]);
-   panelAttrsUpdated=Seq.concat([pannelAttrs,List.ofArray([AttrModule.Style("position","absolute"),AttrModule.DynamicStyle("left",(a=this.lastLeft.v,View.Map(function(x)
+   panelAttrsUpdated=Seq.concat([this.pannelAttrs,List.ofArray([AttrModule.Style("position","absolute"),AttrModule.DynamicStyle("left",(a=this.left.v,View.Map(function(x)
    {
     var f;
-    Global.console.log("x from lastLeft");
     f=function($1,$2)
     {
      return $1($2.toFixed(6)+"px");
@@ -90,7 +87,7 @@
       return f($1,$2);
      };
     }(Global.id))(x);
-   },a))),AttrModule.DynamicStyle("top",(a$1=this.lastTop.v,View.Map(function(y)
+   },a))),AttrModule.DynamicStyle("top",(a$1=this.top.v,View.Map(function(y)
    {
     var f;
     f=function($1,$2)
@@ -105,28 +102,28 @@
      };
     }(Global.id))(y);
    },a$1)))])]);
-   resDiv=(a$2=[Doc.Element("div",titleAttrsUpdated,titleContent),childContent],Doc.Element("div",panelAttrsUpdated,a$2));
-   a$3=this.element;
-   a$4=resDiv.elt;
-   Var.Set(a$3,a$4);
+   resDiv=(a$2=[(a$3=this.titleContent,Doc.Element("div",titleAttrsUpdated,a$3)),this.content],Doc.Element("div",panelAttrsUpdated,a$2));
+   a$4=this.element;
+   a$5=resDiv.elt;
+   Var.Set(a$4,a$5);
    return resDiv;
   }
  },null,Panel$1);
- Panel$1.Create=function(arrangePanels)
+ Panel$1.Create=function(arrangePanels,pannelAttrs,titleAttrs,titleContent,content)
  {
-  return Panel$1.New(Var.Create$1(false),Var.Create$1(false),Var.Create$1(0),Var.Create$1(0),Var.Create$1(0),Var.Create$1(0),Var.Create$1(Doc.Element("div",[],[]).elt),arrangePanels);
+  return Panel$1.New(Var.Create$1(0),Var.Create$1(0),Var.Create$1(Doc.Element("div",[],[]).elt),arrangePanels,pannelAttrs,titleAttrs,titleContent,content);
  };
- Panel$1.New=function(mouseOverVar,mouseDownVar,leftOffset,topOffset,lastLeft,lastTop,element,arrangePanels)
+ Panel$1.New=function(left,top,element,arrangePanels,pannelAttrs,titleAttrs,titleContent,content)
  {
   return new Panel$1({
-   mouseOverVar:mouseOverVar,
-   mouseDownVar:mouseDownVar,
-   leftOffset:leftOffset,
-   topOffset:topOffset,
-   lastLeft:lastLeft,
-   lastTop:lastTop,
+   left:left,
+   top:top,
    element:element,
-   arrangePanels:arrangePanels
+   arrangePanels:arrangePanels,
+   pannelAttrs:pannelAttrs,
+   titleAttrs:titleAttrs,
+   titleContent:titleContent,
+   content:content
   });
  };
  Rect=Panel.Rect=Runtime.Class({
@@ -172,7 +169,7 @@
  },null,Rect);
  Rect.fromPanel=function(panel)
  {
-  return Rect.fromDomRect(panel.element.c).offset(panel.lastLeft.c,panel.lastTop.c);
+  return Rect.fromDomRect(panel.element.c).offset(panel.left.c,panel.top.c);
  };
  Rect.fromDomRect=function(elem)
  {
@@ -189,9 +186,9 @@
    bottom:bottom
   });
  };
- PanelItem.Create=function(name,arrangePanels)
+ PanelItem.Create=function(name,arrangePanels,panelAttrs,titleAttrs,titleContent,content)
  {
-  return PanelItem.New(Key.Fresh(),name,Panel$1.Create(arrangePanels));
+  return PanelItem.New(Key.Fresh(),name,Panel$1.Create(arrangePanels,panelAttrs,titleAttrs,titleContent,content));
  };
  PanelItem.New=function(Key$1,Name,Panel$2)
  {
@@ -204,28 +201,22 @@
  PanelContainer=Panel.PanelContainer=Runtime.Class({
   RenderPanelItem:function(haItem)
   {
-   var $this,_this,o,a,a$1,a$2,a$3,a$4,a$5,a$6,a$7,a$8,a$9,a$10,a$11,a$12;
+   var $this,_this;
    $this=this;
-   _this=(o=haItem.Panel,(a=List.ofArray([AttrModule.Style("Width","150px")]),(a$1=List.ofArray([AttrModule.Class("panelTitle")]),(a$2=List.ofArray([(a$3=[AttrModule.Style("width","100%")],(a$4=[(a$5=[(a$6=[Doc.TextNode(haItem.Name)],Doc.Element("td",[],a$6)),(a$7=[AttrModule.Style("text-align","right"),AttrModule.Style("vertical-align","middle")],(a$8=[(a$9=[AttrModule.Class("material-icons orange600 small"),AttrModule.Style("cursor","pointer"),AttrModule.Handler("mousedown",function()
-   {
-    return function()
-    {
-     return $this.PanelItems.Remove(haItem);
-    };
-   })],(a$10=[Doc.TextNode("clear")],Doc.Element("i",a$9,a$10)))],Doc.Element("td",a$7,a$8)))],Doc.Element("tr",[],a$5))],Doc.Element("table",a$3,a$4)))]),o.panelAttr(a,a$1,a$2,(a$11=[AttrModule.Class("panelContent")],(a$12=[Doc.TextNode("Content")],Doc.Element("div",a$11,a$12))))))));
+   _this=haItem.Panel.get_panelAttr();
    return _this.OnAfterRender(function()
    {
     $this.MovePanelToFreeSpace(haItem);
    });
   },
-  CreateItem:function(name)
+  CreateItem:function(name,panelAttrs,titleAttrs,titleContent,content)
   {
    var $this;
    $this=this;
    this.PanelItems.Append(PanelItem.Create(name,function(a)
    {
     $this.ArrangePanels(a);
-   }));
+   },panelAttrs,titleAttrs,titleContent,content));
   },
   MovePanelToFreeSpace:function(panelItem)
   {
@@ -240,7 +231,7 @@
    {
     return Seq.tryFind(p,l);
    }(this.CollectFreeSpace(rcContainer,panelItem)));
-   (foundCandidate!=null?foundCandidate.$==1:false)?(rc=foundCandidate.$0,a=panelItem.Panel.lastLeft,a$1=rc.left+5,Var.Set(a,a$1),a$2=panelItem.Panel.lastTop,a$3=rc.top+5,Var.Set(a$2,a$3)):void 0;
+   (foundCandidate!=null?foundCandidate.$==1:false)?(rc=foundCandidate.$0,a=panelItem.Panel.left,a$1=rc.left+5,Var.Set(a,a$1),a$2=panelItem.Panel.top,a$3=rc.top+5,Var.Set(a$2,a$3)):void 0;
   },
   ArrangePanels:function(exceptPanel)
   {
@@ -248,7 +239,7 @@
    listOfPanelItems=List.ofSeq(this.PanelItems);
    exceptPanelItem=(p=function(panelItem)
    {
-    return panelItem.Panel.lastLeft.c===exceptPanel.lastLeft.c?panelItem.Panel.lastTop.c===exceptPanel.lastTop.c:false;
+    return panelItem.Panel.left.c===exceptPanel.left.c?panelItem.Panel.top.c===exceptPanel.top.c:false;
    },function(l)
    {
     return Seq.find(p,l);
@@ -276,7 +267,7 @@
    return Seq.fold(function(acc,panel)
    {
     var rcPanel,rcTop,rcLeft,m,t,b;
-    rcPanel=Rect.fromDomRect(panel.Panel.element.c).offset(panel.Panel.lastLeft.c,panel.Panel.lastTop.c).inflate(5,5);
+    rcPanel=Rect.fromDomRect(panel.Panel.element.c).offset(panel.Panel.left.c,panel.Panel.top.c).inflate(5,5);
     Global.console.log("collectFreeSpace: "+Global.String(rcPanel));
     rcTop=Rect.New(0,rcContainer.right,0,rcPanel.top);
     rcLeft=Rect.New(0,rcPanel.left,rcPanel.top,rcPanel.bottom);
@@ -303,6 +294,25 @@
      return List.map(m,l);
     }(List.ofArray([rcTop,rcLeft,Rect.New(rcPanel.right,rcContainer.right,rcLeft.top,rcLeft.bottom),(t=rcPanel.bottom,(b=rcContainer.bottom,Rect.New(rcTop.left,rcTop.right,t,b)))]))));
    },s,x);
+  },
+  FindPanelItemFromChildElement:function(elem)
+  {
+   var p;
+   p=function(item)
+   {
+    while(true)
+     if(Unchecked.Equals(elem,item.Panel.element.c))
+      return true;
+     else
+      if(Unchecked.Equals(elem,null))
+       return false;
+      else
+       elem=elem.parentElement;
+   };
+   return function(l)
+   {
+    return Seq.tryFind(p,l);
+   }(List.ofSeq(this.PanelItems));
   }
  },null,PanelContainer);
  PanelContainer.get_Create=function()

@@ -35,9 +35,21 @@
   {
    return function()
    {
-    var z_index;
+    var z_index,a$19,a$20,a$21,a$22,a$23,a$24,a$25,a$26,a$27,a$28,a$29,a$30,a$31,a$32;
     z_index=List.ofSeq(Client.panelContainer().PanelItems).get_Length()+1;
-    return Client.panelContainer().CreateItem("Panel "+Global.String(z_index));
+    a$19=List.ofArray([AttrModule.Style("Width","150px")]);
+    a$20=List.ofArray([AttrModule.Class("panelTitle")]);
+    a$21=List.ofArray([(a$22=[AttrModule.Style("width","100%")],(a$23=[(a$24=[(a$25=[Doc.TextNode("Panel "+Global.String(z_index))],Doc.Element("td",[],a$25)),(a$26=[AttrModule.Style("text-align","right"),AttrModule.Style("vertical-align","middle")],(a$27=[(a$28=[AttrModule.Class("material-icons orange600 small"),AttrModule.Style("cursor","pointer"),AttrModule.Handler("mousedown",function(elem)
+    {
+     return function()
+     {
+      var m,haItem;
+      m=Client.panelContainer().FindPanelItemFromChildElement(elem);
+      return(m!=null?m.$==1:false)?(haItem=m.$0,Client.panelContainer().PanelItems.Remove(haItem)):null;
+     };
+    })],(a$29=[Doc.TextNode("clear")],Doc.Element("i",a$28,a$29)))],Doc.Element("td",a$26,a$27)))],Doc.Element("tr",[],a$24))],Doc.Element("table",a$22,a$23)))]);
+    a$30=(a$31=[AttrModule.Class("panelContent")],(a$32=[Doc.TextNode("Content")],Doc.Element("div",a$31,a$32)));
+    return Client.panelContainer().CreateItem("Panel "+Global.String(z_index),a$19,a$20,a$21,a$30);
    };
   })],(a$18=[Doc.TextNode("add")],Doc.Element("i",a$17,a$18)))],Doc.Element("td",[],a$16))],Doc.Element("tr",[],a$15))],Doc.Element("table",[],a$8))],Doc.Element("td",a$6,a$7))),Doc.Element("td",[],[panelContainerDiv])],Doc.Element("tr",[],a$5))],Doc.Element("table",[],a$4))];
   return Doc.Element("div",[],a$3);

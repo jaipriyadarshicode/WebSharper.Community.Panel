@@ -15,11 +15,11 @@ type PanelItem =
         Name : string
         Panel:Panel
     }
-    static member Create name arrangePanels=
+    static member Create name arrangePanels panelAttrs titleAttrs titleContent content=
         {   
             Key=Key.Fresh()
             Name = name
-            Panel = Panel.Create arrangePanels
+            Panel = Panel.Create arrangePanels panelAttrs titleAttrs titleContent content
         }
 
 [<JavaScript>]
@@ -31,13 +31,21 @@ type PanelContainer =
         {
             PanelItems = ListModel.Create (fun item ->item.Key) []
         }
+    member x.FindPanelItemFromChildElement (elem:Dom.Element)=
+        x.PanelItems
+        |>List.ofSeq
+        |>List.tryFind (fun item -> let rec checkElement parElem = 
+                                        if parElem = item.Panel.element.Value then true
+                                        else if parElem = null then false
+                                        else checkElement parElem.ParentElement
+                                    checkElement elem)
     member x.CollectFreeSpace (rcContainer:Rect) (except:PanelItem)= 
         x.PanelItems
         |>List.ofSeq 
         |>List.filter (fun item -> item.Key <> except.Key)
         |>List.fold (fun (acc:Rect list) panel -> 
                                 let rcPanel = ((Rect.fromDomRect panel.Panel.element.Value)
-                                                .offset panel.Panel.lastLeft.Value panel.Panel.lastTop.Value)
+                                                .offset panel.Panel.left.Value panel.Panel.top.Value)
                                                 .inflate 5.0 5.0
                                 Console.Log ("collectFreeSpace: " + rcPanel.ToString())   
                                 let rcTop = {left = 0.0; right = rcContainer.right; top = 0.0; bottom = rcPanel.top }
@@ -53,7 +61,7 @@ type PanelContainer =
                                 ) [rcContainer]
     member x.ArrangePanels (exceptPanel:Panel) =
         let listOfPanelItems= x.PanelItems |> List.ofSeq
-        let exceptPanelItem=listOfPanelItems |> List.find (fun panelItem->panelItem.Panel.lastLeft.Value = exceptPanel.lastLeft.Value && panelItem.Panel.lastTop.Value = exceptPanel.lastTop.Value)
+        let exceptPanelItem=listOfPanelItems |> List.find (fun panelItem->panelItem.Panel.left.Value = exceptPanel.left.Value && panelItem.Panel.top.Value = exceptPanel.top.Value)
         let foundPanel=
             x.PanelItems
             |>List.ofSeq
@@ -73,15 +81,15 @@ type PanelContainer =
         match foundCandidate with 
         |None->()
         |Some(rc)->
-              panelItem.Panel.lastLeft.Value <- rc.left + 5.0
-              panelItem.Panel.lastTop.Value <- rc.top + 5.0 
-    member x.CreateItem name =
-            let newItem=PanelItem.Create name (x.ArrangePanels)
+              panelItem.Panel.left.Value <- rc.left + 5.0
+              panelItem.Panel.top.Value <- rc.top + 5.0 
+    member x.CreateItem name panelAttrs titleAttrs titleContent content=
+            let newItem=PanelItem.Create name (x.ArrangePanels) panelAttrs titleAttrs titleContent content
             x.PanelItems.Add  newItem
     member x.RenderPanelItem (haItem:PanelItem) =     
 
         (haItem.Panel.panelAttr
-                [Attr.Style "Width" "150px"]
+              (*  [Attr.Style "Width" "150px"]
                 [Attr.Class "panelTitle"]
                 [tableAttr [Attr.Style "width" "100%"]
                      [tr[
@@ -98,20 +106,6 @@ type PanelContainer =
                 ]
                 (divAttr
                     [Attr.Class "panelContent"]
-                    [text "Content"])).OnAfterRender((fun el -> 
-                        x.MovePanelToFreeSpace haItem
-                        (*let rcPanel=Rect.fromDomRect el
-                        let rcContainer = Rect.fromDomRect el.ParentElement
-                        Console.Log ("Add panel: " + rcPanel.ToString() + " " + rcContainer.ToString())       
-                        let foundCandidate=
-                            x.CollectFreeSpace rcContainer haItem
-                            |>List.tryFind (fun rc -> 
-                                      Console.Log ("Finds free rect: " + rc.ToString())             
-                                      rc.width >= rcPanel.width && rc.height >= rcPanel.height)
-                        match foundCandidate with 
-                        |None->()
-                        |Some(rc)->
-                              haItem.Panel.lastLeft.Value <- rc.left + 5.0
-                              haItem.Panel.lastTop.Value <- rc.top + 5.0*)
-   
-                    ))
+                    [text "Content"])
+                    *)
+                    ).OnAfterRender(fun el -> x.MovePanelToFreeSpace haItem)
