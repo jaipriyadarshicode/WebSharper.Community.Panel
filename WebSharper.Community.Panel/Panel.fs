@@ -23,7 +23,7 @@ type Panel =
         {   
             left = Var.Create 0.0
             top = Var.Create 0.0
-            element=Var.Create ((div[]).Dom)
+            element=Var.Create null
             arrangePanels = arrangePanels
             pannelAttrs = pannelAttrs
             titleAttrs = titleAttrs
@@ -35,6 +35,28 @@ type Panel =
         let mouseOverVar = Var.Create false
         let leftOffset=Var.Create 0.0
         let topOffset=Var.Create 0.0
+
+        let mapDragActive=View.Map (fun (v) -> 
+                                                  //Console.Log ("In mapDragActive Last left:"+x.left.Value.ToString())
+                                                  v&& dragActive.Value) 
+                                                  Mouse.LeftPressed
+        let lastHeldPos = View.UpdateWhile (0,0) mapDragActive Mouse.Position
+        let toLocal = lastHeldPos.Map (fun (x_cor,y_cor)->
+                                                  //Console.Log ("In toLocal")
+                                                  if dragActive.Value then 
+                                                      let domRectParent = x.element.Value.GetBoundingClientRect()
+                                                      let domRectParentParent = x.element.Value.ParentElement.GetBoundingClientRect()
+                                                      let maxX = domRectParentParent.Width-domRectParent.Width
+                                                      let maxY =  domRectParentParent.Height-domRectParent.Height
+                                                      let xPos=min maxX (max 0.0 ((double)x_cor - leftOffset.Value))
+                                                      let yPos=min maxY (max 0.0 ((double)y_cor - topOffset.Value))
+                                                      x.left.Value <- xPos
+                                                      x.top.Value <- yPos
+                                                      Console.Log ("Last left:"+x.left.Value.ToString())
+                                                      x.arrangePanels x
+                                                      (xPos,yPos)
+                                                  else (x.left.Value,x.top.Value)
+                                                  )
         let titleAttrsUpdated = Seq.concat [
                                     x.titleAttrs
                                     [
@@ -46,26 +68,12 @@ type Panel =
                                         on.mouseUp (fun _ _ -> mouseOverVar.Value<-false
                                                                dragActive.Value <- false)
                                         on.mouseDown  (fun (elm:Dom.Element) evnt ->
-                                                                    if mouseOverVar.Value then dragActive.Value <- true
+                                                                    if mouseOverVar.Value 
+                                                                     && x.element.Value.ParentElement <> null && x.element.Value.ParentElement.ParentElement <> null then
+                                                                         dragActive.Value <- true
                                                                     leftOffset.Value <- (double)evnt.ClientX - x.left.Value
                                                                     topOffset.Value <- (double)evnt.ClientY - x.top.Value
-                                                                    )
-                                        on.mouseMove  (fun _ evnt -> 
-                                                          Console.Log ("on.mouseMove:"+evnt.Button.ToString() + " " + evnt.ClientX.ToString())
-                                                          if dragActive.Value 
-                                                             && x.element.Value.ParentElement <> null && x.element.Value.ParentElement.ParentElement <> null then 
-                                                              let x_cor = evnt.ClientX
-                                                              let y_cor = evnt.ClientY
-                                                              let domRectParent = x.element.Value.GetBoundingClientRect()
-                                                              let domRectParentParent = x.element.Value.ParentElement.GetBoundingClientRect()
-                                                              let maxX = domRectParentParent.Width-domRectParent.Width
-                                                              let maxY =  domRectParentParent.Height-domRectParent.Height
-                                                              let xPos=min maxX (max 0.0 ((double)x_cor - leftOffset.Value))
-                                                              let yPos=min maxY (max 0.0 ((double)y_cor - topOffset.Value))
-                                                              x.left.Value <- xPos
-                                                              x.top.Value <- yPos
-                                                              x.arrangePanels x
-                                                      )                                        
+                                                                    )                                       
                                     ]|>Seq.ofList
                                ]
         let panelAttrsUpdated = 
@@ -74,8 +82,12 @@ type Panel =
                      [
                          Attr.Style "position" "absolute"
                          Attr.DynamicStyle "left" (View.Map (fun (x) -> 
-                                                           //Console.Log "x from lastLeft"
+                                                           //Console.Log "x from left"
                                                            sprintf "%fpx" x) x.left.View)
+                         Attr.DynamicStyle "left" (View.Map (fun (x,y) -> 
+                                                           //Console.Log "x from toLocal"
+                                                           sprintf "%fpx" x) toLocal)
+                         Attr.DynamicStyle "top"  (View.Map (fun (x,y) -> sprintf "%fpx" y)  toLocal)
                          Attr.DynamicStyle "top"  (View.Map (fun (y) -> sprintf "%fpx" y)  x.top.View)
                      ]|>Seq.ofList
                  ]
