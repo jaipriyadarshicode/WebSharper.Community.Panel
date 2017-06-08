@@ -43,21 +43,11 @@ module Client =
                                                                    panelContainer.CreateItem  ("Panel " + z_index.ToString()) 
                                                                                               [Attr.Style "Width" "150px"]
                                                                                               [Attr.Class "panelTitle"]
-                                                                                              [tableAttr [Attr.Style "width" "100%"]
-                                                                                                                   [tr[
-                                                                                                                      td[text ("Panel "+z_index.ToString())]
-                                                                                                                      tdAttr[
-                                                                                                                        Attr.Style "text-align" "right"
-                                                                                                                        Attr.Style "vertical-align" "middle"]
-                                                                                                                        [iAttr[Attr.Class "material-icons orange600 small"
-                                                                                                                               Attr.Style "cursor" "pointer"
-                                                                                                                               on.mouseDown (fun elem _->match panelContainer.FindPanelItemFromChildElement elem with
-                                                                                                                                                         |None->()
-                                                                                                                                                         |Some(haItem)->panelContainer.PanelItems.Remove(haItem)
-                                                                                                                                                         )][text "clear"]
-                                                                                                                                                            ]
-                                                                                                                      ]]
-                                                                                                              ]
+                                                                                              [text ("Panel "+z_index.ToString())]
+                                                                                              [
+                                                                                                {icon="edit";action=(fun panel->())}
+                                                                                                {icon="clear";action=(fun panel->panelContainer.PanelItems.Remove(panelContainer.FindPanelItem panel))}
+                                                                                              ]
                                                                                               (divAttr[Attr.Class "panelContent"][text "Content"])
                                                                    )][text "add"]
                                       ]]

@@ -15,11 +15,11 @@ type PanelItem =
         Name : string
         Panel:Panel
     }
-    static member Create name arrangePanels panelAttrs titleAttrs titleContent content=
+    static member Create name arrangePanels panelAttrs titleAttrs titleContent titleButtons content=
         {   
             Key=Key.Fresh()
-            Name = name
-            Panel = Panel.Create arrangePanels panelAttrs titleAttrs titleContent content
+            Name = name 
+            Panel =  Panel.Create arrangePanels panelAttrs titleAttrs titleContent titleButtons content
         }
 
 [<JavaScript>]
@@ -31,14 +31,7 @@ type PanelContainer =
         {
             PanelItems = ListModel.Create (fun item ->item.Key) []
         }
-    member x.FindPanelItemFromChildElement (elem:Dom.Element)=
-        x.PanelItems
-        |>List.ofSeq
-        |>List.tryFind (fun item -> let rec checkElement parElem = 
-                                        if parElem = item.Panel.element.Value then true
-                                        else if parElem = null then false
-                                        else checkElement parElem.ParentElement
-                                    checkElement elem)
+    member x.FindPanelItem panel = x.PanelItems|>List.ofSeq |>List.find (fun item -> item.Panel.element = panel.element)
     member x.CollectFreeSpace (rcContainer:Rect) (except:PanelItem)= 
         x.PanelItems
         |>List.ofSeq 
@@ -83,29 +76,8 @@ type PanelContainer =
         |Some(rc)->
               panelItem.Panel.left.Value <- rc.left + 5.0
               panelItem.Panel.top.Value <- rc.top + 5.0 
-    member x.CreateItem name panelAttrs titleAttrs titleContent content=
-            let newItem=PanelItem.Create name (x.ArrangePanels) panelAttrs titleAttrs titleContent content
+    member x.CreateItem name panelAttrs titleAttrs titleContent titleButtons content=
+            let newItem=PanelItem.Create name (x.ArrangePanels) panelAttrs titleAttrs titleContent titleButtons content
             x.PanelItems.Add  newItem
     member x.RenderPanelItem (haItem:PanelItem) =     
-
-        (haItem.Panel.panelAttr
-              (*  [Attr.Style "Width" "150px"]
-                [Attr.Class "panelTitle"]
-                [tableAttr [Attr.Style "width" "100%"]
-                     [tr[
-                        td[text haItem.Name]
-                        tdAttr[
-                          Attr.Style "text-align" "right"
-                          Attr.Style "vertical-align" "middle"]
-                          [iAttr[Attr.Class "material-icons orange600 small"
-                                 Attr.Style "cursor" "pointer"
-                                 on.mouseDown (fun _ _->x.PanelItems.Remove(haItem)
-                                                        )][text "clear"]
-                                                              ]
-                        ]]
-                ]
-                (divAttr
-                    [Attr.Class "panelContent"]
-                    [text "Content"])
-                    *)
-                    ).OnAfterRender(fun el -> x.MovePanelToFreeSpace haItem)
+        (haItem.Panel.Render).OnAfterRender(fun el -> x.MovePanelToFreeSpace haItem)

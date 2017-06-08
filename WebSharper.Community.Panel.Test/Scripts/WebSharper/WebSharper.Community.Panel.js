@@ -1,11 +1,12 @@
 (function()
 {
  "use strict";
- var Global,WebSharper,Community,Panel,Panel$1,Rect,PanelItem,PanelContainer,IntelliFactory,Runtime,UI,Next,Var,Input,Mouse,View,Operators,Seq,List,AttrModule,Unchecked,Doc,Key,ListModel;
+ var Global,WebSharper,Community,Panel,TitleButton,Panel$1,Rect,PanelItem,PanelContainer,IntelliFactory,Runtime,UI,Next,AttrModule,Doc,Var,Input,Mouse,View,Operators,Seq,List,Unchecked,Key,ListModel;
  Global=window;
  WebSharper=Global.WebSharper=Global.WebSharper||{};
  Community=WebSharper.Community=WebSharper.Community||{};
  Panel=Community.Panel=Community.Panel||{};
+ TitleButton=Panel.TitleButton=Panel.TitleButton||{};
  Panel$1=Panel.Panel=Panel.Panel||{};
  Rect=Panel.Rect=Panel.Rect||{};
  PanelItem=Panel.PanelItem=Panel.PanelItem||{};
@@ -14,6 +15,8 @@
  Runtime=IntelliFactory&&IntelliFactory.Runtime;
  UI=WebSharper&&WebSharper.UI;
  Next=UI&&UI.Next;
+ AttrModule=Next&&Next.AttrModule;
+ Doc=Next&&Next.Doc;
  Var=Next&&Next.Var;
  Input=Next&&Next.Input;
  Mouse=Input&&Input.Mouse;
@@ -21,15 +24,36 @@
  Operators=WebSharper&&WebSharper.Operators;
  Seq=WebSharper&&WebSharper.Seq;
  List=WebSharper&&WebSharper.List;
- AttrModule=Next&&Next.AttrModule;
  Unchecked=WebSharper&&WebSharper.Unchecked;
- Doc=Next&&Next.Doc;
  Key=Next&&Next.Key;
  ListModel=Next&&Next.ListModel;
- Panel$1=Panel.Panel=Runtime.Class({
-  get_panelAttr:function()
+ TitleButton=Panel.TitleButton=Runtime.Class({
+  Render:function(panel)
   {
-   var $this,dragActive,mouseOverVar,leftOffset,topOffset,mapDragActive,a,lastHeldPos,a$1,toLocal,f,titleAttrsUpdated,panelAttrsUpdated,a$2,a$3,a$4,a$5,resDiv,a$6,a$7,a$8,a$9;
+   var $this,a,a$1;
+   $this=this;
+   a=[AttrModule.Class("material-icons orange600 small"),AttrModule.Style("cursor","pointer"),AttrModule.Handler("mousedown",function()
+   {
+    return function()
+    {
+     return $this.action(panel);
+    };
+   })];
+   a$1=[Doc.TextNode(this.icon)];
+   return Doc.Element("i",a,a$1);
+  }
+ },null,TitleButton);
+ TitleButton.New=function(icon,action)
+ {
+  return new TitleButton({
+   icon:icon,
+   action:action
+  });
+ };
+ Panel$1=Panel.Panel=Runtime.Class({
+  get_Render:function()
+  {
+   var $this,dragActive,mouseOverVar,leftOffset,topOffset,mapDragActive,a,lastHeldPos,a$1,toLocal,f,titleAttrsUpdated,titleContentUpdated,a$2,a$3,a$4,a$5,a$6,a$7,m,panelAttrsUpdated,a$8,a$9,a$10,a$11,resDiv,a$12,a$13,a$14;
    $this=this;
    dragActive=Var.Create$1(false);
    mouseOverVar=Var.Create$1(false);
@@ -42,8 +66,8 @@
    lastHeldPos=(a$1=Mouse.get_Position(),View.UpdateWhile([0,0],mapDragActive,a$1));
    toLocal=(f=function(x_cor,y_cor)
    {
-    var domRectParent,domRectParentParent,maxX,maxY,xPos,yPos,a$10,a$11,a$12,c;
-    return dragActive.c?(domRectParent=$this.element.c.getBoundingClientRect(),(domRectParentParent=$this.element.c.parentElement.getBoundingClientRect(),(maxX=domRectParentParent.width-domRectParent.width,(maxY=domRectParentParent.height-domRectParent.height,(xPos=Operators.Min(maxX,Operators.Max(0,+x_cor-leftOffset.c)),(yPos=Operators.Min(maxY,Operators.Max(0,+y_cor-topOffset.c)),(a$10=$this.left,Var.Set(a$10,xPos),a$11=$this.top,Var.Set(a$11,yPos),a$12="Last left:"+(c=$this.left.c,Global.String(c)),Global.console.log(a$12),$this.arrangePanels($this),[xPos,yPos]))))))):[$this.left.c,$this.top.c];
+    var domRectParent,domRectParentParent,maxX,maxY,xPos,yPos,a$15,a$16,a$17,c;
+    return dragActive.c?(domRectParent=$this.element.c.getBoundingClientRect(),(domRectParentParent=$this.element.c.parentElement.getBoundingClientRect(),(maxX=domRectParentParent.width-domRectParent.width,(maxY=domRectParentParent.height-domRectParent.height,(xPos=Operators.Min(maxX,Operators.Max(0,+x_cor-leftOffset.c)),(yPos=Operators.Min(maxY,Operators.Max(0,+y_cor-topOffset.c)),(a$15=$this.left,Var.Set(a$15,xPos),a$16=$this.top,Var.Set(a$16,yPos),a$17="Last left:"+(c=$this.left.c,Global.String(c)),Global.console.log(a$17),$this.arrangePanels($this),[xPos,yPos]))))))):[$this.left.c,$this.top.c];
    },View.Map(function($1)
    {
     return f($1[0],$1[1]);
@@ -71,15 +95,22 @@
    {
     return function(evnt)
     {
-     var a$10,a$11;
+     var a$15,a$16;
      ((mouseOverVar.c?!Unchecked.Equals($this.element.c.parentElement,null):false)?!Unchecked.Equals($this.element.c.parentElement.parentElement,null):false)?Var.Set(dragActive,true):void 0;
-     a$10=+evnt.clientX-$this.left.c;
-     Var.Set(leftOffset,a$10);
-     a$11=+evnt.clientY-$this.top.c;
-     return Var.Set(topOffset,a$11);
+     a$15=+evnt.clientX-$this.left.c;
+     Var.Set(leftOffset,a$15);
+     a$16=+evnt.clientY-$this.top.c;
+     return Var.Set(topOffset,a$16);
     };
    })])]);
-   panelAttrsUpdated=Seq.concat([this.pannelAttrs,List.ofArray([AttrModule.Style("position","absolute"),AttrModule.DynamicStyle("left",(a$2=this.left.v,View.Map(function(x)
+   titleContentUpdated=(a$2=[AttrModule.Style("width","100%")],(a$3=[(a$4=[(a$5=this.titleContent,Doc.Element("td",[],a$5)),(a$6=[AttrModule.Style("text-align","right"),AttrModule.Style("vertical-align","middle")],(a$7=(m=function(btn)
+   {
+    return btn.Render($this);
+   },function(l)
+   {
+    return List.map(m,l);
+   }(this.titleButtons)),Doc.Element("td",a$6,a$7)))],Doc.Element("tr",[],a$4))],Doc.Element("table",a$2,a$3)));
+   panelAttrsUpdated=Seq.concat([this.pannelAttrs,List.ofArray([AttrModule.Style("position","absolute"),AttrModule.DynamicStyle("left",(a$8=this.left.v,View.Map(function(x)
    {
     var f$1;
     f$1=function($1,$2)
@@ -93,7 +124,7 @@
       return f$1($1,$2);
      };
     }(Global.id))(x);
-   },a$2))),AttrModule.DynamicStyle("left",(a$3=function(x)
+   },a$8))),AttrModule.DynamicStyle("left",(a$9=function(x)
    {
     var f$1;
     f$1=function($1,$2)
@@ -109,8 +140,8 @@
     }(Global.id))(x);
    },View.Map(function($1)
    {
-    return a$3($1[0],$1[1]);
-   },toLocal))),AttrModule.DynamicStyle("top",(a$4=function(x,y)
+    return a$9($1[0],$1[1]);
+   },toLocal))),AttrModule.DynamicStyle("top",(a$10=function(x,y)
    {
     var f$1;
     f$1=function($1,$2)
@@ -126,8 +157,8 @@
     }(Global.id))(y);
    },View.Map(function($1)
    {
-    return a$4($1[0],$1[1]);
-   },toLocal))),AttrModule.DynamicStyle("top",(a$5=this.top.v,View.Map(function(y)
+    return a$10($1[0],$1[1]);
+   },toLocal))),AttrModule.DynamicStyle("top",(a$11=this.top.v,View.Map(function(y)
    {
     var f$1;
     f$1=function($1,$2)
@@ -141,19 +172,19 @@
       return f$1($1,$2);
      };
     }(Global.id))(y);
-   },a$5)))])]);
-   resDiv=(a$6=[(a$7=this.titleContent,Doc.Element("div",titleAttrsUpdated,a$7)),this.content],Doc.Element("div",panelAttrsUpdated,a$6));
-   a$8=this.element;
-   a$9=resDiv.elt;
-   Var.Set(a$8,a$9);
+   },a$11)))])]);
+   resDiv=(a$12=[Doc.Element("div",titleAttrsUpdated,[titleContentUpdated]),this.content],Doc.Element("div",panelAttrsUpdated,a$12));
+   a$13=this.element;
+   a$14=resDiv.elt;
+   Var.Set(a$13,a$14);
    return resDiv;
   }
  },null,Panel$1);
- Panel$1.Create=function(arrangePanels,pannelAttrs,titleAttrs,titleContent,content)
+ Panel$1.Create=function(arrangePanels,pannelAttrs,titleAttrs,titleContent,titleButtons,content)
  {
-  return Panel$1.New(Var.Create$1(0),Var.Create$1(0),Var.Create$1(null),arrangePanels,pannelAttrs,titleAttrs,titleContent,content);
+  return Panel$1.New(Var.Create$1(0),Var.Create$1(0),Var.Create$1(null),arrangePanels,pannelAttrs,titleAttrs,titleContent,titleButtons,content);
  };
- Panel$1.New=function(left,top,element,arrangePanels,pannelAttrs,titleAttrs,titleContent,content)
+ Panel$1.New=function(left,top,element,arrangePanels,pannelAttrs,titleAttrs,titleContent,titleButtons,content)
  {
   return new Panel$1({
    left:left,
@@ -163,6 +194,7 @@
    pannelAttrs:pannelAttrs,
    titleAttrs:titleAttrs,
    titleContent:titleContent,
+   titleButtons:titleButtons,
    content:content
   });
  };
@@ -226,9 +258,9 @@
    bottom:bottom
   });
  };
- PanelItem.Create=function(name,arrangePanels,panelAttrs,titleAttrs,titleContent,content)
+ PanelItem.Create=function(name,arrangePanels,panelAttrs,titleAttrs,titleContent,titleButtons,content)
  {
-  return PanelItem.New(Key.Fresh(),name,Panel$1.Create(arrangePanels,panelAttrs,titleAttrs,titleContent,content));
+  return PanelItem.New(Key.Fresh(),name,Panel$1.Create(arrangePanels,panelAttrs,titleAttrs,titleContent,titleButtons,content));
  };
  PanelItem.New=function(Key$1,Name,Panel$2)
  {
@@ -243,20 +275,20 @@
   {
    var $this,_this;
    $this=this;
-   _this=haItem.Panel.get_panelAttr();
+   _this=haItem.Panel.get_Render();
    return _this.OnAfterRender(function()
    {
     $this.MovePanelToFreeSpace(haItem);
    });
   },
-  CreateItem:function(name,panelAttrs,titleAttrs,titleContent,content)
+  CreateItem:function(name,panelAttrs,titleAttrs,titleContent,titleButtons,content)
   {
    var $this;
    $this=this;
    this.PanelItems.Append(PanelItem.Create(name,function(a)
    {
     $this.ArrangePanels(a);
-   },panelAttrs,titleAttrs,titleContent,content));
+   },panelAttrs,titleAttrs,titleContent,titleButtons,content));
   },
   MovePanelToFreeSpace:function(panelItem)
   {
@@ -335,23 +367,16 @@
     }(List.ofArray([rcTop,rcLeft,Rect.New(rcPanel.right,rcContainer.right,rcLeft.top,rcLeft.bottom),(t=rcPanel.bottom,(b=rcContainer.bottom,Rect.New(rcTop.left,rcTop.right,t,b)))]))));
    },s,x);
   },
-  FindPanelItemFromChildElement:function(elem)
+  FindPanelItem:function(panel)
   {
    var p;
    p=function(item)
    {
-    while(true)
-     if(Unchecked.Equals(elem,item.Panel.element.c))
-      return true;
-     else
-      if(Unchecked.Equals(elem,null))
-       return false;
-      else
-       elem=elem.parentElement;
+    return Unchecked.Equals(item.Panel.element,panel.element);
    };
    return function(l)
    {
-    return Seq.tryFind(p,l);
+    return Seq.find(p,l);
    }(List.ofSeq(this.PanelItems));
   }
  },null,PanelContainer);

@@ -8,7 +8,17 @@ open WebSharper.UI.Next.Html
 open WebSharper.UI.Next.Input
 
 [<JavaScript>]
-type Panel =
+type TitleButton =
+    {
+        icon:string
+        action:Panel->unit            
+    }
+    member x.Render panel=
+        iAttr[Attr.Class "material-icons orange600 small"
+              Attr.Style "cursor" "pointer"
+              on.mouseDown (fun elem _->x.action panel)
+              ][text x.icon]:>Doc
+and [<JavaScript>] Panel =
     {
         left:Var<double>
         top:Var<double>
@@ -17,9 +27,10 @@ type Panel =
         pannelAttrs:seq<Attr>
         titleAttrs:seq<Attr>
         titleContent:seq<Doc>
+        titleButtons:list<TitleButton>
         content:Doc
     }
-    static member Create arrangePanels pannelAttrs titleAttrs titleContent content=
+    static member Create arrangePanels pannelAttrs titleAttrs titleContent titleButtons content=
         {   
             left = Var.Create 0.0
             top = Var.Create 0.0
@@ -28,9 +39,10 @@ type Panel =
             pannelAttrs = pannelAttrs
             titleAttrs = titleAttrs
             titleContent = titleContent
+            titleButtons = titleButtons
             content = content
         }
-    member x.panelAttr=
+    member x.Render=
         let dragActive = Var.Create false
         let mouseOverVar = Var.Create false
         let leftOffset=Var.Create 0.0
@@ -76,6 +88,17 @@ type Panel =
                                                                     )                                       
                                     ]|>Seq.ofList
                                ]
+        let titleContentUpdated =
+                            tableAttr [Attr.Style "width" "100%"]
+                                      [tr[
+                                         td x.titleContent
+                                         tdAttr[
+                                           Attr.Style "text-align" "right"
+                                           Attr.Style "vertical-align" "middle"]
+                                           (x.titleButtons |>List.map (fun btn -> btn.Render x))
+                                         ]]
+                                      
+
         let panelAttrsUpdated = 
                 Seq.concat [
                      x.pannelAttrs
@@ -95,7 +118,7 @@ type Panel =
             divAttr
                  panelAttrsUpdated
                  [
-                     divAttr titleAttrsUpdated x.titleContent
+                     divAttr titleAttrsUpdated [titleContentUpdated]
                      x.content
                  ]
         x.element.Value <- resDiv.Dom
