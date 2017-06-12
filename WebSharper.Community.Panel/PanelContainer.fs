@@ -7,38 +7,23 @@ open WebSharper.UI.Next.Client
 open WebSharper.UI.Next.Html
 open WebSharper.Community.Panel
 
-
-[<JavaScript>]
-type PanelItem =
-    {
-        Key:Key
-        Name : string
-        Panel:Panel
-    }
-    static member Create name arrangePanels panelAttrs titleAttrs titleContent titleButtons content=
-        {   
-            Key=Key.Fresh()
-            Name = name 
-            Panel =  Panel.Create arrangePanels panelAttrs titleAttrs titleContent titleButtons content
-        }
-
 [<JavaScript>]
 type PanelContainer =
     {
-        PanelItems : ListModel<Key,PanelItem>
+        PanelItems : ListModel<Key,Panel>
     }
     static member Create =
         {
             PanelItems = ListModel.Create (fun item ->item.Key) []
         }
-    member x.FindPanelItem panel = x.PanelItems|>List.ofSeq |>List.find (fun item -> item.Panel.element = panel.element)
-    member x.CollectFreeSpace (rcContainer:Rect) (except:PanelItem)= 
+    member x.FindPanelItem panel = x.PanelItems|>List.ofSeq |>List.find (fun item -> item.Element = panel.Element)
+    member x.CollectFreeSpace (rcContainer:Rect) (except:Panel)= 
         x.PanelItems
         |>List.ofSeq 
         |>List.filter (fun item -> item.Key <> except.Key)
         |>List.fold (fun (acc:Rect list) panel -> 
-                                let rcPanel = ((Rect.fromDomRect panel.Panel.element.Value)
-                                                .offset panel.Panel.left.Value panel.Panel.top.Value)
+                                let rcPanel = ((Rect.fromDomRect panel.Element.Value)
+                                                .offset panel.Left.Value panel.Top.Value)
                                                 .inflate 5.0 5.0
                                 Console.Log ("collectFreeSpace: " + rcPanel.ToString())   
                                 let rcTop = {left = 0.0; right = rcContainer.right; top = 0.0; bottom = rcPanel.top }
@@ -54,17 +39,17 @@ type PanelContainer =
                                 ) [rcContainer]
     member x.ArrangePanels (exceptPanel:Panel) =
         let listOfPanelItems= x.PanelItems |> List.ofSeq
-        let exceptPanelItem=listOfPanelItems |> List.find (fun panelItem->panelItem.Panel.left.Value = exceptPanel.left.Value && panelItem.Panel.top.Value = exceptPanel.top.Value)
+        let exceptPanelItem=listOfPanelItems |> List.find (fun panelItem->panelItem.Left.Value = exceptPanel.Left.Value && panelItem.Top.Value = exceptPanel.Top.Value)
         let foundPanel=
             x.PanelItems
             |>List.ofSeq
-            |>List.tryFind (fun panelItem-> panelItem.Key <> exceptPanelItem.Key && not ((Rect.fromPanel panelItem.Panel).intersect (Rect.fromPanel exceptPanelItem.Panel)).isEmpty)
+            |>List.tryFind (fun panelItem-> panelItem.Key <> exceptPanelItem.Key && not ((Rect.fromPanel panelItem).intersect (Rect.fromPanel exceptPanelItem)).isEmpty)
         match foundPanel with
         |None ->()
         |Some(panelItem) -> x.MovePanelToFreeSpace panelItem
-    member x.MovePanelToFreeSpace (panelItem:PanelItem) = 
-        let rcPanel=Rect.fromPanel (panelItem.Panel)
-        let rcContainer = Rect.fromDomRect (panelItem.Panel.element.Value.ParentElement)
+    member x.MovePanelToFreeSpace (panelItem:Panel) = 
+        let rcPanel=Rect.fromPanel (panelItem)
+        let rcContainer = Rect.fromDomRect (panelItem.Element.Value.ParentElement)
        //Console.Log ("Add panel: " + rcPanel.ToString() + " " + rcContainer.ToString())       
         let foundCandidate=
             x.CollectFreeSpace rcContainer panelItem
@@ -74,10 +59,10 @@ type PanelContainer =
         match foundCandidate with 
         |None->()
         |Some(rc)->
-              panelItem.Panel.left.Value <- rc.left + 5.0
-              panelItem.Panel.top.Value <- rc.top + 5.0 
-    member x.CreateItem name panelAttrs titleAttrs titleContent titleButtons content=
-            let newItem=PanelItem.Create name (x.ArrangePanels) panelAttrs titleAttrs titleContent titleButtons content
-            x.PanelItems.Add  newItem
-    member x.RenderPanelItem (haItem:PanelItem) =     
-        (haItem.Panel.Render).OnAfterRender(fun el -> x.MovePanelToFreeSpace haItem)
+              panelItem.Left.Value <- rc.left + 5.0
+              panelItem.Top.Value <- rc.top + 5.0 
+    member x.AddPanel (panel:Panel)= //panelAttrs titleAttrs titleContent titleButtons content=
+            //let newItem=Panel.Create (x.ArrangePanels) //panelAttrs titleAttrs titleContent titleButtons content
+            x.PanelItems.Add  (panel.WithArrangePanelsFnc(x.ArrangePanels))
+    member x.RenderPanelItem (haItem:Panel) =     
+        (haItem.Render).OnAfterRender(fun el -> x.MovePanelToFreeSpace haItem)

@@ -5,43 +5,52 @@ open WebSharper.JavaScript
 open WebSharper.UI.Next
 open WebSharper.UI.Next.Client
 open WebSharper.UI.Next.Html
-open WebSharper.UI.Next.Input
+//open WebSharper.UI.Next.Input
 
 [<JavaScript>]
 type TitleButton =
     {
-        icon:string
-        action:Panel->unit            
+        Icon:string
+        Action:Panel->unit            
     }
     member x.Render panel=
         iAttr[Attr.Class "material-icons orange600 small"
               Attr.Style "cursor" "pointer"
-              on.mouseDown (fun elem _->x.action panel)
-              ][text x.icon]:>Doc
+              on.click (fun elem _->x.Action panel)
+              ][text x.Icon]:>Doc
 and [<JavaScript>] Panel =
     {
-        left:Var<double>
-        top:Var<double>
-        element:Var<Dom.Element>
-        arrangePanels:Panel->unit
-        pannelAttrs:seq<Attr>
-        titleAttrs:seq<Attr>
-        titleContent:seq<Doc>
-        titleButtons:list<TitleButton>
-        content:Doc
+        Key:Key
+        Left:Var<double>
+        Top:Var<double>
+        Element:Var<Dom.Element>
+        ArrangePanels:Panel->unit
+        PannelAttrs:seq<Attr>
+        TitleAttrs:seq<Attr>
+        TitleContent:Doc
+        TitleButtons:list<TitleButton>
+        PanelContent:Doc
     }
-    static member Create arrangePanels pannelAttrs titleAttrs titleContent titleButtons content=
+    static member Create =
         {   
-            left = Var.Create 0.0
-            top = Var.Create 0.0
-            element=Var.Create null
-            arrangePanels = arrangePanels
-            pannelAttrs = pannelAttrs
-            titleAttrs = titleAttrs
-            titleContent = titleContent
-            titleButtons = titleButtons
-            content = content
+            Key=Key.Fresh()
+            Left = Var.Create 0.0
+            Top = Var.Create 0.0
+            Element=Var.Create null
+            ArrangePanels = (fun _ ->())
+            PannelAttrs = []
+            TitleAttrs =  [Attr.Class "panelTitle"]
+            TitleContent = div[]
+            TitleButtons = []
+            PanelContent = div[]
+
         }
+    member x.WithPannelAttrs attrs = {x with PannelAttrs=attrs}
+    member x.WithTitleAttrs attrs = {x with TitleAttrs=attrs}
+    member x.WithTitleContent content = {x with TitleContent=content}
+    member x.WithTitleButtons buttons = {x with TitleButtons=buttons}
+    member x.WithPanelContent content = {x with PanelContent=content}
+    member x.WithArrangePanelsFnc fnc = {x with ArrangePanels=fnc}
     member x.Render=
         let dragActive = Var.Create false
         let mouseOverVar = Var.Create false
@@ -51,26 +60,26 @@ and [<JavaScript>] Panel =
         let mapDragActive=View.Map (fun (v) -> 
                                                   //Console.Log ("In mapDragActive Last left:"+x.left.Value.ToString())
                                                   v&& dragActive.Value) 
-                                                  Mouse.LeftPressed
-        let lastHeldPos = View.UpdateWhile (0,0) mapDragActive Mouse.Position
+                                                  Input.Mouse.LeftPressed
+        let lastHeldPos = View.UpdateWhile (0,0) mapDragActive Input.Mouse.Position
         let toLocal = lastHeldPos.Map (fun (x_cor,y_cor)->
                                                   //Console.Log ("In toLocal")
                                                   if dragActive.Value then 
-                                                      let domRectParent = x.element.Value.GetBoundingClientRect()
-                                                      let domRectParentParent = x.element.Value.ParentElement.GetBoundingClientRect()
+                                                      let domRectParent = x.Element.Value.GetBoundingClientRect()
+                                                      let domRectParentParent = x.Element.Value.ParentElement.GetBoundingClientRect()
                                                       let maxX = domRectParentParent.Width-domRectParent.Width
                                                       let maxY =  domRectParentParent.Height-domRectParent.Height
                                                       let xPos=min maxX (max 0.0 ((double)x_cor - leftOffset.Value))
                                                       let yPos=min maxY (max 0.0 ((double)y_cor - topOffset.Value))
-                                                      x.left.Value <- xPos
-                                                      x.top.Value <- yPos
-                                                      Console.Log ("Last left:"+x.left.Value.ToString())
-                                                      x.arrangePanels x
+                                                      x.Left.Value <- xPos
+                                                      x.Top.Value <- yPos
+                                                      Console.Log ("Last left:"+x.Left.Value.ToString())
+                                                      x.ArrangePanels x
                                                       (xPos,yPos)
-                                                  else (x.left.Value,x.top.Value)
+                                                  else (x.Left.Value,x.Top.Value)
                                                   )
         let titleAttrsUpdated = Seq.concat [
-                                    x.titleAttrs
+                                    x.TitleAttrs
                                     [
                                         Attr.Style "cursor" "grab"
                                         on.mouseEnter  (fun _ _ -> 
@@ -81,37 +90,37 @@ and [<JavaScript>] Panel =
                                                                dragActive.Value <- false)
                                         on.mouseDown  (fun (elm:Dom.Element) evnt ->
                                                                     if mouseOverVar.Value 
-                                                                     && x.element.Value.ParentElement <> null && x.element.Value.ParentElement.ParentElement <> null then
+                                                                     && x.Element.Value.ParentElement <> null && x.Element.Value.ParentElement.ParentElement <> null then
                                                                          dragActive.Value <- true
-                                                                    leftOffset.Value <- (double)evnt.ClientX - x.left.Value
-                                                                    topOffset.Value <- (double)evnt.ClientY - x.top.Value
+                                                                    leftOffset.Value <- (double)evnt.ClientX - x.Left.Value
+                                                                    topOffset.Value <- (double)evnt.ClientY - x.Top.Value
                                                                     )                                       
                                     ]|>Seq.ofList
                                ]
         let titleContentUpdated =
                             tableAttr [Attr.Style "width" "100%"]
                                       [tr[
-                                         td x.titleContent
+                                         td [x.TitleContent]
                                          tdAttr[
                                            Attr.Style "text-align" "right"
                                            Attr.Style "vertical-align" "middle"]
-                                           (x.titleButtons |>List.map (fun btn -> btn.Render x))
+                                           (x.TitleButtons |>List.map (fun btn -> btn.Render x))
                                          ]]
                                       
 
         let panelAttrsUpdated = 
                 Seq.concat [
-                     x.pannelAttrs
+                     x.PannelAttrs
                      [
                          Attr.Style "position" "absolute"
                          Attr.DynamicStyle "left" (View.Map (fun (x) -> 
                                                            //Console.Log "x from left"
-                                                           sprintf "%fpx" x) x.left.View)
+                                                           sprintf "%fpx" x) x.Left.View)
                          Attr.DynamicStyle "left" (View.Map (fun (x,y) -> 
                                                            //Console.Log "x from toLocal"
                                                            sprintf "%fpx" x) toLocal)
                          Attr.DynamicStyle "top"  (View.Map (fun (x,y) -> sprintf "%fpx" y)  toLocal)
-                         Attr.DynamicStyle "top"  (View.Map (fun (y) -> sprintf "%fpx" y)  x.top.View)
+                         Attr.DynamicStyle "top"  (View.Map (fun (y) -> sprintf "%fpx" y)  x.Top.View)
                      ]|>Seq.ofList
                  ]
         let resDiv = 
@@ -119,7 +128,7 @@ and [<JavaScript>] Panel =
                  panelAttrsUpdated
                  [
                      divAttr titleAttrsUpdated [titleContentUpdated]
-                     x.content
+                     x.PanelContent
                  ]
-        x.element.Value <- resDiv.Dom
+        x.Element.Value <- resDiv.Dom
         resDiv

@@ -1,7 +1,7 @@
 (function()
 {
  "use strict";
- var Global,WebSharper,Community,Panel,Test,Client,SC$1,UI,Next,Doc,AttrModule,List,TitleButton,IntelliFactory,Runtime,PanelContainer;
+ var Global,WebSharper,Community,Panel,Test,Client,SC$1,UI,Next,Doc,AttrModule,List,Panel$1,TitleButton,IntelliFactory,Runtime,PanelContainer;
  Global=window;
  WebSharper=Global.WebSharper=Global.WebSharper||{};
  Community=WebSharper.Community=WebSharper.Community||{};
@@ -14,6 +14,7 @@
  Doc=Next&&Next.Doc;
  AttrModule=Next&&Next.AttrModule;
  List=WebSharper&&WebSharper.List;
+ Panel$1=Panel&&Panel.Panel;
  TitleButton=Panel&&Panel.TitleButton;
  IntelliFactory=Global.IntelliFactory;
  Runtime=IntelliFactory&&IntelliFactory.Runtime;
@@ -36,19 +37,17 @@
   {
    return function()
    {
-    var z_index,a$19,a$20,a$21,a$22,a$23,a$24,a$25;
+    var z_index,panel,a$19,a$20;
     z_index=List.ofSeq(Client.panelContainer().PanelItems).get_Length()+1;
-    a$19=List.ofArray([AttrModule.Style("Width","150px")]);
-    a$20=List.ofArray([AttrModule.Class("panelTitle")]);
-    a$21=List.ofArray([Doc.TextNode("Panel "+Global.String(z_index))]);
-    a$22=List.ofArray([TitleButton.New("edit",function()
+    panel=Panel$1.get_Create().WithPannelAttrs([AttrModule.Style("Width","150px")]).WithTitleContent(Doc.TextNode("Panel "+Global.String(z_index))).WithTitleButtons(List.ofArray([TitleButton.New("add",function()
     {
-    }),TitleButton.New("clear",function(panel)
+    }),TitleButton.New("edit",function()
     {
-     Client.panelContainer().PanelItems.Remove(Client.panelContainer().FindPanelItem(panel));
-    })]);
-    a$23=(a$24=[AttrModule.Class("panelContent")],(a$25=[Doc.TextNode("Content")],Doc.Element("div",a$24,a$25)));
-    return Client.panelContainer().CreateItem("Panel "+Global.String(z_index),a$19,a$20,a$21,a$22,a$23);
+    }),TitleButton.New("clear",function(panel$1)
+    {
+     Client.panelContainer().PanelItems.Remove(Client.panelContainer().FindPanelItem(panel$1));
+    })])).WithPanelContent((a$19=[AttrModule.Class("panelContent")],(a$20=[Doc.TextNode("Content")],Doc.Element("div",a$19,a$20))));
+    return Client.panelContainer().AddPanel(panel);
    };
   })],(a$18=[Doc.TextNode("add")],Doc.Element("i",a$17,a$18)))],Doc.Element("td",[],a$16))],Doc.Element("tr",[],a$15))],Doc.Element("table",[],a$8))],Doc.Element("td",a$6,a$7))),Doc.Element("td",[],[panelContainerDiv])],Doc.Element("tr",[],a$5))],Doc.Element("table",[],a$4))];
   return Doc.Element("div",[],a$3);

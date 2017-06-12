@@ -40,15 +40,17 @@ module Client =
                                 tr[td[iAttr[Attr.Class "material-icons orange600"
                                             Attr.Style "cursor" "pointer"
                                             on.mouseDown (fun _ _->let z_index=(panelContainer.PanelItems |>List.ofSeq).Length + 1
-                                                                   panelContainer.CreateItem  ("Panel " + z_index.ToString()) 
-                                                                                              [Attr.Style "Width" "150px"]
-                                                                                              [Attr.Class "panelTitle"]
-                                                                                              [text ("Panel "+z_index.ToString())]
-                                                                                              [
-                                                                                                {icon="edit";action=(fun panel->())}
-                                                                                                {icon="clear";action=(fun panel->panelContainer.PanelItems.Remove(panelContainer.FindPanelItem panel))}
-                                                                                              ]
-                                                                                              (divAttr[Attr.Class "panelContent"][text "Content"])
+                                                                   let panel=Panel.Create
+                                                                                  .WithPannelAttrs([Attr.Style "Width" "150px"])
+                                                                                  .WithTitleContent(text ("Panel "+z_index.ToString()))
+                                                                                  .WithTitleButtons(
+                                                                                               [
+                                                                                                 {Icon="add";Action=(fun panel->())}
+                                                                                                 {Icon="edit";Action=(fun panel->())}
+                                                                                                 {Icon="clear";Action=(fun panel->panelContainer.PanelItems.Remove(panelContainer.FindPanelItem panel))}
+                                                                                               ])
+                                                                                  .WithPanelContent(divAttr[Attr.Class "panelContent"][text "Content"])
+                                                                   panelContainer.AddPanel panel
                                                                    )][text "add"]
                                       ]]
                              ]
