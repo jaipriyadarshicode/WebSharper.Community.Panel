@@ -11,6 +11,13 @@ type Rect =
         top:double
         bottom:double
     }
+    static member Create left top right bottom =
+        {
+            left =left
+            top=top
+            right=right
+            bottom=bottom
+        }
     static member fromDomRect (elem:Dom.Element) = 
         let domRc=elem.GetBoundingClientRect()
         {left=0.0;top=0.0;right=domRc.Width;bottom=domRc.Height}

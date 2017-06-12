@@ -50,7 +50,7 @@
   <ItemGroup>
     <Compile Include="Panel.fs" />
     <Compile Include="Rect.fs" />
-    <Compile Include="PanelContainer.fs" />
+    <Compile Include="LayoutManagers.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -12,18 +12,17 @@ open WebSharper.Community.Panel
 module Client =
 
     let panelContainer=PanelContainer.Create
+                                     .WithWidth(400.0).WithHeight(400.0)
+                                     .WithLayoutManager(LayoutManagers.FloatingPanelLayoutManager 5.0)
+                                     //.WithLayoutManager(LayoutManagers.StackPanelLayoutManager)
+                                     .WithAttributes(
+                                        [
+                                             Attr.Style "border" "1px solid white"
+                                             Attr.Style "left" "0px"
+                                             Attr.Style "top" "0px"
+                                             Attr.Style "position" "relative"
+                                        ])
     let Main () =
-        let listPanels=
-                    ListModel.View panelContainer.PanelItems
-                    |> Doc.BindSeqCachedBy (fun m -> m.Key) (panelContainer.RenderPanelItem)
-        let panelContainerDiv = 
-                        divAttr[ Attr.Style "border" "1px solid white"
-                                 Attr.Style "Width" "800px"
-                                 Attr.Style "Height" "400px"
-                                 Attr.Style "left" "0px"
-                                 Attr.Style "top" "0px"
-                                 Attr.Style "position" "relative"
-                        ][listPanels]
         div [
             table[
                 tr[
@@ -55,7 +54,7 @@ module Client =
                                       ]]
                              ]
                       ]
-                    td[panelContainerDiv]
+                    td[panelContainer.Render]
                   ]
             ]
         ]

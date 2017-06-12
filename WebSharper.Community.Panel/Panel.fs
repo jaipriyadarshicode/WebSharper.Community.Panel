@@ -24,12 +24,14 @@ and [<JavaScript>] Panel =
         Left:Var<double>
         Top:Var<double>
         Element:Var<Dom.Element>
-        ArrangePanels:Panel->unit
+        Relayout:Panel->unit
         PannelAttrs:seq<Attr>
+        IsWithTitle : bool
         TitleAttrs:seq<Attr>
         TitleContent:Doc
         TitleButtons:list<TitleButton>
         PanelContent:Doc
+        Children : PanelContainer
     }
     static member Create =
         {   
@@ -37,21 +39,24 @@ and [<JavaScript>] Panel =
             Left = Var.Create 0.0
             Top = Var.Create 0.0
             Element=Var.Create null
-            ArrangePanels = (fun _ ->())
+            Relayout = (fun _ ->())
             PannelAttrs = []
+            IsWithTitle = true
             TitleAttrs =  [Attr.Class "panelTitle"]
             TitleContent = div[]
             TitleButtons = []
             PanelContent = div[]
-
+            Children = PanelContainer.Create
         }
     member x.WithPannelAttrs attrs = {x with PannelAttrs=attrs}
     member x.WithTitleAttrs attrs = {x with TitleAttrs=attrs}
     member x.WithTitleContent content = {x with TitleContent=content}
     member x.WithTitleButtons buttons = {x with TitleButtons=buttons}
     member x.WithPanelContent content = {x with PanelContent=content}
-    member x.WithArrangePanelsFnc fnc = {x with ArrangePanels=fnc}
-    member x.Render=
+    member x.WithRelayoutFnc fnc = {x with Relayout=fnc}
+    member x.WithChildPanelContainer container = {x with Children = container}
+    member x.WithTitle withTitle = {x with IsWithTitle = withTitle} 
+    member x.Render =
         let dragActive = Var.Create false
         let mouseOverVar = Var.Create false
         let leftOffset=Var.Create 0.0
@@ -74,7 +79,7 @@ and [<JavaScript>] Panel =
                                                       x.Left.Value <- xPos
                                                       x.Top.Value <- yPos
                                                       Console.Log ("Last left:"+x.Left.Value.ToString())
-                                                      x.ArrangePanels x
+                                                      x.Relayout x
                                                       (xPos,yPos)
                                                   else (x.Left.Value,x.Top.Value)
                                                   )
@@ -82,9 +87,7 @@ and [<JavaScript>] Panel =
                                     x.TitleAttrs
                                     [
                                         Attr.Style "cursor" "grab"
-                                        on.mouseEnter  (fun _ _ -> 
-                                              //Console.Log ("mouseEnter")
-                                              mouseOverVar.Value<-true)
+                                        on.mouseEnter  (fun _ _ ->mouseOverVar.Value<-true)
                                         on.mouseLeave (fun _ _ -> if not dragActive.Value then mouseOverVar.Value<-false)
                                         on.mouseUp (fun _ _ -> mouseOverVar.Value<-false
                                                                dragActive.Value <- false)
@@ -127,8 +130,56 @@ and [<JavaScript>] Panel =
             divAttr
                  panelAttrsUpdated
                  [
-                     divAttr titleAttrsUpdated [titleContentUpdated]
+                     (if x.IsWithTitle then
+                        divAttr titleAttrsUpdated [titleContentUpdated]
+                      else div[])
                      x.PanelContent
+                     x.Children.Render
                  ]
         x.Element.Value <- resDiv.Dom
         resDiv
+
+and [<JavaScript>] ILayoutManager=
+        abstract member Relayout :   panelContaner:PanelContainer->exceptPanel:Panel->unit
+        abstract member PlacePanel : panelContaner:PanelContainer->panel:Panel -> unit
+
+and [<JavaScript>] PanelContainer =
+    {
+        Width:Var<double>
+        Height:Var<double>
+        PanelItems : ListModel<Key,Panel>
+        LayoutManager : ILayoutManager 
+        ContainerAttributes :seq<Attr>
+    }
+    static member Create =
+        {
+            Width = Var.Create 0.0
+            Height = Var.Create 0.0
+            PanelItems = ListModel.Create (fun item ->item.Key) []
+            LayoutManager = {new ILayoutManager with override x.Relayout panelItems exceptPanel = ()
+                                                     override x.PlacePanel panelItems exceptPanel = ()}
+            ContainerAttributes = []
+        }
+    member x.WithAttributes attrs = {x with ContainerAttributes = attrs}
+    member x.WithLayoutManager layoutManager = {x with LayoutManager = layoutManager}
+    member x.WithWidth cx = {x with Width = Var.Create cx}
+    member x.WithHeight cy = {x with Height = Var.Create cy}
+    member x.FindPanelItem panel = x.PanelItems|>List.ofSeq |>List.find (fun item -> item.Element = panel.Element)
+    member x.Resize cx cy = x.Width.Value <- cx
+                            x.Height.Value <- cy
+    member x.AddPanel (panel:Panel) = 
+        x.PanelItems.Add  (panel.WithRelayoutFnc(x.LayoutManager.Relayout x))
+        //x.LayoutManager.Relayout x panel
+    member x.Render = 
+        let attrsUpdated = Seq.concat [
+                                            x.ContainerAttributes
+                                            [
+                                                Attr.DynamicStyle "width"  (View.Map (fun (x) -> sprintf "%fpx" x)  x.Width.View)
+                                                Attr.DynamicStyle "height" (View.Map (fun (y) -> sprintf "%fpx" y)  x.Height.View)                                      
+                                            ]|>Seq.ofList
+                                      ]
+        divAttr attrsUpdated
+                [
+                    ListModel.View x.PanelItems
+                    |> Doc.BindSeqCachedBy (fun m -> m.Key) (fun item -> (item.Render).OnAfterRender(fun el -> x.LayoutManager.PlacePanel x item))
+                ]
