@@ -2,6 +2,8 @@
 
 open WebSharper
 open WebSharper.JavaScript
+open WebSharper.UI.Next
+open WebSharper.UI.Next.Client
 
 [<JavaScript>]
 type Rect =
@@ -19,8 +21,11 @@ type Rect =
             bottom=bottom
         }
     static member fromDomRect (elem:Dom.Element) = 
-        let domRc=elem.GetBoundingClientRect()
-        {left=0.0;top=0.0;right=domRc.Width;bottom=domRc.Height}
+        if elem <> null then
+            let domRc=elem.GetBoundingClientRect()
+            {left=0.0;top=0.0;right=domRc.Width;bottom=domRc.Height}
+        else 
+            Rect.Create 0.0 0.0 0.0 0.0
     static member fromPanel (panel:Panel) = 
         (Rect.fromDomRect panel.Element.Value)
          .offset panel.Left.Value panel.Top.Value       

@@ -13,13 +13,21 @@ module LayoutManagers =
         ((Rect.fromDomRect panel.Element.Value)
           .offset panel.Left.Value panel.Top.Value)
           .inflate margin margin
-    let calcClientArea panelItems (except:Panel) margin=
+    let calcClientArea panelItems (stopItem:Panel) margin=
         Console.Log ("calcClientArea 1") 
+        let rec sublist (acc:list<Panel>) (lst:list<Panel>) =
+            match lst with
+            |[]->acc
+            |head::rest -> if head.Key = stopItem.Key then
+                                acc
+                           else
+                                sublist (head::acc) rest 
         let rects =
             panelItems
             |>List.ofSeq 
-            |>List.filter (fun item -> item.Key <> except.Key)
-            |>List.map (fun panel -> panelRect panel margin)
+            |>sublist []
+            |>List.map (fun panel ->Console.Log (panel.InternalName) 
+                                    panelRect panel margin)
         Console.Log ("calcClientArea 2") 
         if rects.IsEmpty then
             Rect.Create 0.0 0.0 0.0 0.0
@@ -93,7 +101,9 @@ module LayoutManagers =
                                                             let rc=calcClientArea panelContainer.PanelItems panel 0.0
                                                             Console.Log("PlacePanel 2")
                                                             let rcItem=panelRect panel 0.0
-                                                            Console.Log("PlacePanel "+rc.right.ToString() + " " + rcItem.right.ToString())
+                                                            Console.Log("PlacePanel "+rc.right.ToString() + " " + rcItem.right.ToString() + " " + rc.bottom.ToString() + " " + rcItem.bottom.ToString())
                                                             panelContainer.Resize (rc.right + rcItem.right + 2.0) (max rc.bottom rcItem.bottom + 2.0)
-                                                            placePanel panelContainer panel 0.0
+                                                            panel.Left.Value <- rc.right
+                                                            panel.Top.Value <- rc.top
+                                                            //placePanel panelContainer panel 0.0
                                     }

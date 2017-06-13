@@ -12,16 +12,10 @@ open WebSharper.Community.Panel
 module Client =
 
     let panelContainer=PanelContainer.Create
-                                     .WithWidth(400.0).WithHeight(400.0)
+                                     .WithWidth(800.0).WithHeight(400.0)
                                      .WithLayoutManager(LayoutManagers.FloatingPanelLayoutManager 5.0)
                                      //.WithLayoutManager(LayoutManagers.StackPanelLayoutManager)
-                                     .WithAttributes(
-                                        [
-                                             Attr.Style "border" "1px solid white"
-                                             Attr.Style "left" "0px"
-                                             Attr.Style "top" "0px"
-                                             Attr.Style "position" "relative"
-                                        ])
+                                     .WithAttributes([Attr.Style "border" "1px solid white"])
     let Main () =
         div [
             table[
@@ -39,6 +33,13 @@ module Client =
                                 tr[td[iAttr[Attr.Class "material-icons orange600"
                                             Attr.Style "cursor" "pointer"
                                             on.mouseDown (fun _ _->let z_index=(panelContainer.PanelItems |>List.ofSeq).Length + 1
+                                                                   let childPanelContainer = PanelContainer.Create
+                                                                                                           .WithLayoutManager(LayoutManagers.StackPanelLayoutManager)
+                                                                   let childPanel=Panel.Create
+                                                                                       .WithTitle(false)
+                                                                                       .WithPanelContent(divAttr[Attr.Class "panelContent"
+                                                                                                                 Attr.Style "Width" "150px"][text "Content"])
+                                                                   childPanelContainer.AddPanel childPanel
                                                                    let panel=Panel.Create
                                                                                   .WithPannelAttrs([Attr.Style "Width" "150px"])
                                                                                   .WithTitleContent(text ("Panel "+z_index.ToString()))
@@ -48,7 +49,8 @@ module Client =
                                                                                                  {Icon="edit";Action=(fun panel->())}
                                                                                                  {Icon="clear";Action=(fun panel->panelContainer.PanelItems.Remove(panelContainer.FindPanelItem panel))}
                                                                                                ])
-                                                                                  .WithPanelContent(divAttr[Attr.Class "panelContent"][text "Content"])
+                                                                                  //.WithPanelContent(divAttr[Attr.Class "panelContent"][text "Content"])
+                                                                                  .WithChildPanelContainer(childPanelContainer)
                                                                    panelContainer.AddPanel panel
                                                                    )][text "add"]
                                       ]]

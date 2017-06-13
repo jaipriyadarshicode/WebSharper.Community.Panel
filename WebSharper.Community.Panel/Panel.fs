@@ -32,6 +32,8 @@ and [<JavaScript>] Panel =
         TitleButtons:list<TitleButton>
         PanelContent:Doc
         Children : PanelContainer
+        InternalName:string
+        onAfterRender:Dom.Element -> unit
     }
     static member Create =
         {   
@@ -47,6 +49,8 @@ and [<JavaScript>] Panel =
             TitleButtons = []
             PanelContent = div[]
             Children = PanelContainer.Create
+            InternalName=""
+            onAfterRender=(fun (_) ->())
         }
     member x.WithPannelAttrs attrs = {x with PannelAttrs=attrs}
     member x.WithTitleAttrs attrs = {x with TitleAttrs=attrs}
@@ -56,6 +60,8 @@ and [<JavaScript>] Panel =
     member x.WithRelayoutFnc fnc = {x with Relayout=fnc}
     member x.WithChildPanelContainer container = {x with Children = container}
     member x.WithTitle withTitle = {x with IsWithTitle = withTitle} 
+    member x.WithInternalName name = {x with InternalName = name} 
+    member x.WithOnAfterRender fnc = {x with onAfterRender = fnc} 
     member x.Render =
         let dragActive = Var.Create false
         let mouseOverVar = Var.Create false
@@ -137,7 +143,7 @@ and [<JavaScript>] Panel =
                      x.Children.Render
                  ]
         x.Element.Value <- resDiv.Dom
-        resDiv
+        resDiv.OnAfterRender(x.onAfterRender)
 
 and [<JavaScript>] ILayoutManager=
         abstract member Relayout :   panelContaner:PanelContainer->exceptPanel:Panel->unit
@@ -175,7 +181,8 @@ and [<JavaScript>] PanelContainer =
                                             x.ContainerAttributes
                                             [
                                                 Attr.DynamicStyle "width"  (View.Map (fun (x) -> sprintf "%fpx" x)  x.Width.View)
-                                                Attr.DynamicStyle "height" (View.Map (fun (y) -> sprintf "%fpx" y)  x.Height.View)                                      
+                                                Attr.DynamicStyle "height" (View.Map (fun (y) -> sprintf "%fpx" y)  x.Height.View)
+                                                Attr.Style "position" "relative"                                      
                                             ]|>Seq.ofList
                                       ]
         divAttr attrsUpdated
