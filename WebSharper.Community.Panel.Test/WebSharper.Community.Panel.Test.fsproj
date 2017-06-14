@@ -75,6 +75,9 @@
       <HintPath>..\packages\Zafir.4.0.161.45-beta6\lib\net40\WebSharper.Collections.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="WebSharper.Community.PropertyGrid">
+      <HintPath>..\..\WebSharper.Community.PropertyGrid\WebSharper.Community.PropertyGrid\bin\Debug\WebSharper.Community.PropertyGrid.dll</HintPath>
+    </Reference>
     <Reference Include="WebSharper.Control">
       <HintPath>..\packages\Zafir.4.0.161.45-beta6\lib\net40\WebSharper.Control.dll</HintPath>
       <Private>True</Private>

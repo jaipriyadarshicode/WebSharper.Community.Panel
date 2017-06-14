@@ -7,6 +7,7 @@ open WebSharper.UI.Next
 open WebSharper.UI.Next.Client
 open WebSharper.UI.Next.Html
 open WebSharper.Community.Panel
+open WebSharper.Community.PropertyGrid
 
 [<JavaScript>]
 module Client =
@@ -16,6 +17,7 @@ module Client =
                                      .WithLayoutManager(LayoutManagers.FloatingPanelLayoutManager 5.0)
                                      //.WithLayoutManager(LayoutManagers.StackPanelLayoutManager)
                                      .WithAttributes([Attr.Style "border" "1px solid white"])
+    let propertyGrid = PropertyGrid.Create
     let Main () =
         div [
             table[
@@ -26,9 +28,7 @@ module Client =
                                 trAttr[Attr.Style "Height" "100%"]
                                   [
                                     tdAttr[Attr.Style "Height" "100%"]
-                                          [iAttr[Attr.Class "material-icons orange600"]
-                                                [text "dehaze"]
-                                          ]
+                                          [iAttr[Attr.Class "material-icons orange600"][text "dehaze"]]
                                   ]
                                 tr[td[iAttr[Attr.Class "material-icons orange600"
                                             Attr.Style "cursor" "pointer"
@@ -40,20 +40,27 @@ module Client =
                                                                                        .WithPanelContent(divAttr[Attr.Class "panelContent"
                                                                                                                  Attr.Style "Width" "150px"][text "Content"])
                                                                    childPanelContainer.AddPanel childPanel
+                                                                   let titleVar=Var.Create ("Panel "+z_index.ToString())
+                                                                   let selVar = Var.Create "bla2"
                                                                    let panel=Panel.Create
                                                                                   .WithPannelAttrs([Attr.Style "Width" "150px"])
-                                                                                  .WithTitleContent(text ("Panel "+z_index.ToString()))
+                                                                                  .WithTitleContent(textView titleVar.View)
                                                                                   .WithTitleButtons(
                                                                                                [
                                                                                                  {Icon="add";Action=(fun panel->())}
-                                                                                                 {Icon="edit";Action=(fun panel->())}
+                                                                                                 {Icon="edit";Action=(fun panel->propertyGrid.Edit (panel.Properties))}
                                                                                                  {Icon="clear";Action=(fun panel->panelContainer.PanelItems.Remove(panelContainer.FindPanelItem panel))}
                                                                                                ])
                                                                                   //.WithPanelContent(divAttr[Attr.Class "panelContent"][text "Content"])
                                                                                   .WithChildPanelContainer(childPanelContainer)
+                                                                                  .WithProperties([
+                                                                                                    Properties.string "title1" titleVar
+                                                                                                  ])
                                                                    panelContainer.AddPanel panel
                                                                    )][text "add"]
-                                      ]]
+                                      ]
+                                    ]
+                                tr[td[propertyGrid.Render]]
                              ]
                       ]
                     td[panelContainer.Render]

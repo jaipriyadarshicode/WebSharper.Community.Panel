@@ -5,6 +5,7 @@ open WebSharper.JavaScript
 open WebSharper.UI.Next
 open WebSharper.UI.Next.Client
 open WebSharper.UI.Next.Html
+open WebSharper.Community.PropertyGrid
 //open WebSharper.UI.Next.Input
 
 [<JavaScript>]
@@ -34,6 +35,7 @@ and [<JavaScript>] Panel =
         Children : PanelContainer
         InternalName:string
         onAfterRender:Dom.Element -> unit
+        Properties : List<IProperty>
     }
     static member Create =
         {   
@@ -51,6 +53,7 @@ and [<JavaScript>] Panel =
             Children = PanelContainer.Create
             InternalName=""
             onAfterRender=(fun (_) ->())
+            Properties = []
         }
     member x.WithPannelAttrs attrs = {x with PannelAttrs=attrs}
     member x.WithTitleAttrs attrs = {x with TitleAttrs=attrs}
@@ -62,6 +65,7 @@ and [<JavaScript>] Panel =
     member x.WithTitle withTitle = {x with IsWithTitle = withTitle} 
     member x.WithInternalName name = {x with InternalName = name} 
     member x.WithOnAfterRender fnc = {x with onAfterRender = fnc} 
+    member x.WithProperties properties = {x with Properties = properties}
     member x.Render =
         let dragActive = Var.Create false
         let mouseOverVar = Var.Create false
