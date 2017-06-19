@@ -14,7 +14,7 @@ module LayoutManagers =
           .offset panel.Left.Value panel.Top.Value)
           .inflate margin margin
     let calcClientArea panelItems (stopItem:Panel) margin=
-        Console.Log ("calcClientArea 1") 
+        //Console.Log ("calcClientArea 1") 
         let rec sublist (acc:list<Panel>) (lst:list<Panel>) =
             match lst with
             |[]->acc
@@ -28,7 +28,7 @@ module LayoutManagers =
             |>sublist []
             |>List.map (fun panel ->Console.Log (panel.InternalName) 
                                     panelRect panel margin)
-        Console.Log ("calcClientArea 2") 
+        //Console.Log ("calcClientArea 2") 
         if rects.IsEmpty then
             Rect.Create 0.0 0.0 0.0 0.0
         else
@@ -50,7 +50,7 @@ module LayoutManagers =
                                 ::{rcTop with top = rcPanel.bottom; bottom = rcContainer.bottom}::[]
                                 |>List.map (fun rc -> acc |> List.map (fun accRc -> accRc.intersect rc) 
                                                           |> List.filter (fun accRect -> 
-                                                                               Console.Log ("filter: " + accRect.ToString())   
+                                                                               //Console.Log ("filter: " + accRect.ToString())   
                                                                                not accRect.isEmpty ))
                                 |>List.concat
                                 ) [rcContainer] 
@@ -70,7 +70,7 @@ module LayoutManagers =
               panelItem.Top.Value <- rc.top + margin 
     let placePanel panelContainer panelItem margin =
         let rcPanel=Rect.fromPanel (panelItem)
-        let rcContainer = Rect.Create 0.0 0.0 panelContainer.Width.Value panelContainer.Height.Value//Rect.fromDomRect (panelItem.Element.Value.ParentElement)      
+        let rcContainer = Rect.Create 0.0 0.0 panelContainer.Width panelContainer.Height//Rect.fromDomRect (panelItem.Element.Value.ParentElement)      
         let foundCandidate=
             collectFreeSpace panelContainer.PanelItems rcContainer panelItem margin
             |>List.tryFind (fun rc -> rc.width >= rcPanel.width && rc.height >= rcPanel.height)
@@ -94,16 +94,23 @@ module LayoutManagers =
                                                  override x.Relayout panelContainer exceptPanel = relayout panelContainer exceptPanel margin 
                                                  override x.PlacePanel panelContainer panelItem = placePanel panelContainer panelItem margin                                                                 
                                           }
-    let StackPanelLayoutManager =  {new ILayoutManager with 
-                                                 override x.Relayout panelContainer exceptPanel = relayout panelContainer exceptPanel 0.0
-                                                 override x.PlacePanel panelContainer panel = 
-                                                            Console.Log("PlacePanel 1")
+    let StackPanelLayoutManager = (*  let resizeContainer panelContainer panel=
+                                                            Console.Log("resizeContainer 1")
                                                             let rc=calcClientArea panelContainer.PanelItems panel 0.0
-                                                            Console.Log("PlacePanel 2")
+                                                            Console.Log("resizeContainer 2")
                                                             let rcItem=panelRect panel 0.0
-                                                            Console.Log("PlacePanel "+rc.right.ToString() + " " + rcItem.right.ToString() + " " + rc.bottom.ToString() + " " + rcItem.bottom.ToString())
+                                                            Console.Log("resizeContainer "+rc.right.ToString() + " " + rcItem.right.ToString() + " " + rc.bottom.ToString() + " " + rcItem.bottom.ToString())
                                                             panelContainer.Resize (rc.right + rcItem.right + 2.0) (max rc.bottom rcItem.bottom + 2.0)
-                                                            panel.Left.Value <- rc.right
-                                                            panel.Top.Value <- rc.top
+                                                            rc
+                                               *)
+                                    {new ILayoutManager with 
+                                                 override x.Relayout panelContainer exceptPanel =
+                                                            //resizeContainer panelContainer exceptPanel |>ignore
+                                                            relayout panelContainer exceptPanel 0.0
+                                                 override x.PlacePanel panelContainer panel = 
+                                                            //let rc = resizeContainer panelContainer panel
+                                                            //panel.Left.Value <- rc.right
+                                                            //panel.Top.Value <- rc.top
                                                             //placePanel panelContainer panel 0.0
+                                                            ()
                                     }

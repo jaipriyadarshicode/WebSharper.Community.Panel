@@ -37,13 +37,16 @@ module Client =
                                                                                                            .WithLayoutManager(LayoutManagers.StackPanelLayoutManager)
                                                                    let childPanel=Panel.Create
                                                                                        .WithTitle(false)
+                                                                                       .WithPannelAttrs([Attr.Style "position" "absolute"])
                                                                                        .WithPanelContent(divAttr[Attr.Class "panelContent"
-                                                                                                                 Attr.Style "Width" "150px"][text "Content"])
+                                                                                                                 Attr.Style "Width" "150px"
+                                                                                                                 ][text "Content"])
                                                                    childPanelContainer.AddPanel childPanel
                                                                    let titleVar=Var.Create ("Panel "+z_index.ToString())
-                                                                   let selVar = Var.Create "bla2"
                                                                    let panel=Panel.Create
-                                                                                  .WithPannelAttrs([Attr.Style "Width" "150px"])
+                                                                                  .WithPannelAttrs([Attr.Style "Width" "150px"
+                                                                                                    Attr.Style "position" "absolute"
+                                                                                                   ])
                                                                                   .WithTitleContent(textView titleVar.View)
                                                                                   .WithTitleButtons(
                                                                                                [

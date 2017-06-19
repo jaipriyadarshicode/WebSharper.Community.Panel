@@ -31,14 +31,13 @@
   {
    return function()
    {
-    var z_index,childPanelContainer,childPanel,a$19,a$20,titleVar,selVar,panel;
+    var z_index,childPanelContainer,childPanel,a$19,a$20,titleVar,panel;
     z_index=List.ofSeq(Client.panelContainer().PanelItems).get_Length()+1;
     childPanelContainer=PanelContainer.get_Create().WithLayoutManager(LayoutManagers.StackPanelLayoutManager());
-    childPanel=Panel$1.get_Create().WithTitle(false).WithPanelContent((a$19=[AttrModule.Class("panelContent"),AttrModule.Style("Width","150px")],(a$20=[Doc.TextNode("Content")],Doc.Element("div",a$19,a$20))));
+    childPanel=Panel$1.get_Create().WithTitle(false).WithPannelAttrs([AttrModule.Style("position","absolute")]).WithPanelContent((a$19=[AttrModule.Class("panelContent"),AttrModule.Style("Width","150px")],(a$20=[Doc.TextNode("Content")],Doc.Element("div",a$19,a$20))));
     childPanelContainer.AddPanel(childPanel);
     titleVar=Var.Create$1("Panel "+Global.String(z_index));
-    selVar=Var.Create$1("bla2");
-    panel=Panel$1.get_Create().WithPannelAttrs([AttrModule.Style("Width","150px")]).WithTitleContent(Doc.TextView(titleVar.v)).WithTitleButtons(List.ofArray([TitleButton.New("add",function()
+    panel=Panel$1.get_Create().WithPannelAttrs([AttrModule.Style("Width","150px"),AttrModule.Style("position","absolute")]).WithTitleContent(Doc.TextView(titleVar.v)).WithTitleButtons(List.ofArray([TitleButton.New("add",function()
     {
     }),TitleButton.New("edit",function(panel$1)
     {

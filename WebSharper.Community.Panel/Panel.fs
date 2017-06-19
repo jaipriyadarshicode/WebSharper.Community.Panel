@@ -34,7 +34,7 @@ and [<JavaScript>] Panel =
         PanelContent:Doc
         Children : PanelContainer
         InternalName:string
-        onAfterRender:Dom.Element -> unit
+        onAfterRender:Panel -> unit
         Properties : List<IProperty>
     }
     static member Create =
@@ -125,7 +125,9 @@ and [<JavaScript>] Panel =
                 Seq.concat [
                      x.PannelAttrs
                      [
-                         Attr.Style "position" "absolute"
+                         //Attr.Style "position" "absolute"
+                         //Attr.Style "height" "auto"
+                         //Attr.Style "overflow" "auto"
                          Attr.DynamicStyle "left" (View.Map (fun (x) -> 
                                                            //Console.Log "x from left"
                                                            sprintf "%fpx" x) x.Left.View)
@@ -147,7 +149,7 @@ and [<JavaScript>] Panel =
                      x.Children.Render
                  ]
         x.Element.Value <- resDiv.Dom
-        resDiv.OnAfterRender(x.onAfterRender)
+        resDiv.OnAfterRender(fun _ -> x.onAfterRender x)
 
 and [<JavaScript>] ILayoutManager=
         abstract member Relayout :   panelContaner:PanelContainer->exceptPanel:Panel->unit
@@ -155,16 +157,16 @@ and [<JavaScript>] ILayoutManager=
 
 and [<JavaScript>] PanelContainer =
     {
-        Width:Var<double>
-        Height:Var<double>
+        Width:double //Var<double>
+        Height:double //Var<double>
         PanelItems : ListModel<Key,Panel>
         LayoutManager : ILayoutManager 
         ContainerAttributes :seq<Attr>
     }
     static member Create =
         {
-            Width = Var.Create 0.0
-            Height = Var.Create 0.0
+            Width = 0.0 //Var.Create 0.0
+            Height = 0.0 //Var.Create 0.0
             PanelItems = ListModel.Create (fun item ->item.Key) []
             LayoutManager = {new ILayoutManager with override x.Relayout panelItems exceptPanel = ()
                                                      override x.PlacePanel panelItems exceptPanel = ()}
@@ -172,20 +174,29 @@ and [<JavaScript>] PanelContainer =
         }
     member x.WithAttributes attrs = {x with ContainerAttributes = attrs}
     member x.WithLayoutManager layoutManager = {x with LayoutManager = layoutManager}
-    member x.WithWidth cx = {x with Width = Var.Create cx}
-    member x.WithHeight cy = {x with Height = Var.Create cy}
+    member x.WithWidth cx = {x with Width = cx } //Var.Create cx}
+    member x.WithHeight cy = {x with Height = cy } //Var.Create cy}
     member x.FindPanelItem panel = x.PanelItems|>List.ofSeq |>List.find (fun item -> item.Element = panel.Element)
-    member x.Resize cx cy = x.Width.Value <- cx
-                            x.Height.Value <- cy
+ //   member x.Resize cx cy = x.Width.Value <- cx
+ //                           Console.Log("Resize cy:"+cy.ToString())
+ //                           x.Height.Value <- cy
     member x.AddPanel (panel:Panel) = 
         x.PanelItems.Add  (panel.WithRelayoutFnc(x.LayoutManager.Relayout x))
         //x.LayoutManager.Relayout x panel
     member x.Render = 
+        let attrWidth = if x.Width > 0.0 then   [Attr.Style "width" (sprintf "%fpx" x.Width)] else []
+        let attrHeight = if x.Height > 0.0 then  [Attr.Style "height" (sprintf "%fpx" x.Height)] else []
         let attrsUpdated = Seq.concat [
                                             x.ContainerAttributes
+                                            attrWidth|>Seq.ofList
+                                            attrHeight|>Seq.ofList
                                             [
-                                                Attr.DynamicStyle "width"  (View.Map (fun (x) -> sprintf "%fpx" x)  x.Width.View)
-                                                Attr.DynamicStyle "height" (View.Map (fun (y) -> sprintf "%fpx" y)  x.Height.View)
+                                            (*    Attr.DynamicStyle "width"  (View.Map (fun (x) -> 
+                                                                        Console.Log("DynamicStyle x:"+x.ToString())
+                                                                        sprintf "%fpx" x)  x.Width.View)
+                                                Attr.DynamicStyle "height" (View.Map (fun (y) -> 
+                                                                        Console.Log("DynamicStyle y:"+y.ToString())
+                                                                        sprintf "%fpx" y)  x.Height.View)   *)
                                                 Attr.Style "position" "relative"                                      
                                             ]|>Seq.ofList
                                       ]
