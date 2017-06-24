@@ -10,8 +10,8 @@ module LayoutManagers =
 
     open WebSharper.Community.Panel
     let panelRect panel margin= 
-        ((Rect.fromDomRect panel.Element.Value)
-          .offset panel.Left.Value panel.Top.Value)
+        (Rect.fromPanel panel)
+          //.offset panel.Left.Value panel.Top.Value)
           .inflate margin margin
     let calcClientArea panelItems (stopItem:Panel) margin=
         //Console.Log ("calcClientArea 1") 
@@ -41,10 +41,10 @@ module LayoutManagers =
         |>List.ofSeq 
         |>List.filter (fun item -> item.Key <> except.Key)
         |>List.fold (fun (acc:Rect list) panel -> 
-                                let rcPanel = panelRect panel margin
-                                Console.Log ("collectFreeSpace: " + rcPanel.ToString())   
+                                let rcPanel = panelRect panel 0.0
+                               // Console.Log ("collectFreeSpace: " + rcPanel.ToString())   
                                 let rcTop = {left = 0.0; right = rcContainer.right; top = 0.0; bottom = rcPanel.top }
-                                let rcLeft = {left = 0.0; right = rcPanel.left; top = rcPanel.top; bottom = rcPanel.bottom }
+                                let rcLeft = {left = 0.0; right = rcPanel.left; top = 0.0; bottom = rcContainer.bottom }
                                 rcTop::rcLeft
                                 ::{rcLeft with left = rcPanel.right; right = rcContainer.right}
                                 ::{rcTop with top = rcPanel.bottom; bottom = rcContainer.bottom}::[]
@@ -73,7 +73,8 @@ module LayoutManagers =
         let rcContainer = Rect.Create 0.0 0.0 panelContainer.Width panelContainer.Height//Rect.fromDomRect (panelItem.Element.Value.ParentElement)      
         let foundCandidate=
             collectFreeSpace panelContainer.PanelItems rcContainer panelItem margin
-            |>List.tryFind (fun rc -> rc.width >= rcPanel.width && rc.height >= rcPanel.height)
+            |>List.tryFind (fun rc -> //Console.Log ("placePanel: " + rc.ToString()) 
+                                      rc.width >= rcPanel.width && rc.height >= rcPanel.height)
         match foundCandidate with 
         |None->()
         |Some(rc)->
@@ -82,11 +83,14 @@ module LayoutManagers =
     let relayout panelContainer exceptPanel margin =
         let panelItems = panelContainer.PanelItems
         let listOfPanelItems= panelItems |> List.ofSeq
-        let exceptPanelItem=listOfPanelItems |> List.find (fun panelItem->panelItem.Left.Value = exceptPanel.Left.Value && panelItem.Top.Value = exceptPanel.Top.Value)
+        //let exceptPanelItem=listOfPanelItems |> List.find (fun panelItem->panelItem.Left.Value = exceptPanel.Left.Value && panelItem.Top.Value = exceptPanel.Top.Value)
+        let exceptPanelItem=listOfPanelItems |> List.find (fun panelItem->panelItem.Key = exceptPanel.Key)
         let foundPanel=
             panelItems
             |>List.ofSeq
-            |>List.tryFind (fun panelItem-> panelItem.Key <> exceptPanelItem.Key && not ((Rect.fromPanel panelItem).intersect (Rect.fromPanel exceptPanelItem)).isEmpty)
+            |>List.tryFind (fun panelItem-> 
+                               // Console.Log("relayout:"+(Rect.fromPanel panelItem).ToString()+" "+(Rect.fromPanel exceptPanelItem).ToString())
+                                panelItem.Key <> exceptPanelItem.Key && not ((Rect.fromPanel panelItem).intersect (Rect.fromPanel exceptPanelItem)).isEmpty)
         match foundPanel with
         |None ->()
         |Some(panelItem) -> movePanelToFreeSpace panelItems panelItem margin  

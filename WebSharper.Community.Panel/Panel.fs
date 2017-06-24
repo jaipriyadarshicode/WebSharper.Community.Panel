@@ -24,6 +24,8 @@ and [<JavaScript>] Panel =
         Key:Key
         Left:Var<double>
         Top:Var<double>
+        Width:double
+        Height:double
         Element:Var<Dom.Element>
         Relayout:Panel->unit
         PannelAttrs:seq<Attr>
@@ -42,6 +44,8 @@ and [<JavaScript>] Panel =
             Key=Key.Fresh()
             Left = Var.Create 0.0
             Top = Var.Create 0.0
+            Width = 0.0
+            Height = 0.0
             Element=Var.Create null
             Relayout = (fun _ ->())
             PannelAttrs = []
@@ -66,6 +70,9 @@ and [<JavaScript>] Panel =
     member x.WithInternalName name = {x with InternalName = name} 
     member x.WithOnAfterRender fnc = {x with onAfterRender = fnc} 
     member x.WithProperties properties = {x with Properties = properties}
+    member x.WithWidth cx = {x with Width = cx } //Var.Create cx}
+    member x.WithHeight cy = {x with Height = cy } //Var.Create cy}
+
     member x.Render =
         let dragActive = Var.Create false
         let mouseOverVar = Var.Create false
@@ -88,7 +95,7 @@ and [<JavaScript>] Panel =
                                                       let yPos=min maxY (max 0.0 ((double)y_cor - topOffset.Value))
                                                       x.Left.Value <- xPos
                                                       x.Top.Value <- yPos
-                                                      Console.Log ("Last left:"+x.Left.Value.ToString())
+                                                      //Console.Log ("Last left:"+x.Left.Value.ToString())
                                                       x.Relayout x
                                                       (xPos,yPos)
                                                   else (x.Left.Value,x.Top.Value)
@@ -121,9 +128,13 @@ and [<JavaScript>] Panel =
                                          ]]
                                       
 
+        let attrWidth = (if x.Width > 0.0 then   [Attr.Style "width" (sprintf "%fpx" x.Width)] else [])   |>Seq.ofList
+        let attrHeight = (if x.Height > 0.0 then  [Attr.Style "height" (sprintf "%fpx" x.Height)] else [])  |>Seq.ofList
+        let attrWidthHeight = Seq.concat [attrWidth;attrHeight]
         let panelAttrsUpdated = 
                 Seq.concat [
                      x.PannelAttrs
+                     attrWidthHeight
                      [
                          //Attr.Style "position" "absolute"
                          //Attr.Style "height" "auto"
@@ -142,11 +153,19 @@ and [<JavaScript>] Panel =
             divAttr
                  panelAttrsUpdated
                  [
-                     (if x.IsWithTitle then
-                        divAttr titleAttrsUpdated [titleContentUpdated]
-                      else div[])
-                     x.PanelContent
-                     x.Children.Render
+                     tableAttr [] [
+                         tr[
+                             tdAttr attrWidth [
+                                 (if x.IsWithTitle then
+                                    divAttr titleAttrsUpdated [titleContentUpdated]
+                                  else div[])]
+                          ]
+                         tr[
+                             tdAttr [] [
+                                 x.PanelContent
+                                 x.Children.Render]
+                         ]
+                     ]
                  ]
         x.Element.Value <- resDiv.Dom
         resDiv.OnAfterRender(fun _ -> x.onAfterRender x)

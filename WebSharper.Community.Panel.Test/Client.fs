@@ -37,16 +37,14 @@ module Client =
                                                                                                            .WithLayoutManager(LayoutManagers.StackPanelLayoutManager)
                                                                    let childPanel=Panel.Create
                                                                                        .WithTitle(false)
-                                                                                       .WithPannelAttrs([Attr.Style "position" "absolute"])
-                                                                                       .WithPanelContent(divAttr[Attr.Class "panelContent"
-                                                                                                                 Attr.Style "Width" "150px"
-                                                                                                                 ][text "Content"])
+                                                                                       .WithPannelAttrs([Attr.Class "panelContent"])
+                                                                                       .WithPanelContent(divAttr[][text "Content"])
+                                                                                       .WithWidth(150.0)
+                                                                                       .WithHeight(150.0)
                                                                    childPanelContainer.AddPanel childPanel
                                                                    let titleVar=Var.Create ("Panel "+z_index.ToString())
                                                                    let panel=Panel.Create
-                                                                                  .WithPannelAttrs([Attr.Style "Width" "150px"
-                                                                                                    Attr.Style "position" "absolute"
-                                                                                                   ])
+                                                                                  .WithPannelAttrs([Attr.Style "position" "absolute"])
                                                                                   .WithTitleContent(textView titleVar.View)
                                                                                   .WithTitleButtons(
                                                                                                [
@@ -56,6 +54,7 @@ module Client =
                                                                                                ])
                                                                                   //.WithPanelContent(divAttr[Attr.Class "panelContent"][text "Content"])
                                                                                   .WithChildPanelContainer(childPanelContainer)
+                                                                                  .WithWidth(150.0)
                                                                                   .WithProperties([
                                                                                                     Properties.string "title1" titleVar
                                                                                                   ])

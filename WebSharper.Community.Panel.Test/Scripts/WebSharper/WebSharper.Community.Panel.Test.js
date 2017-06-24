@@ -31,13 +31,13 @@
   {
    return function()
    {
-    var z_index,childPanelContainer,childPanel,a$19,a$20,titleVar,panel;
+    var z_index,childPanelContainer,childPanel,a$19,titleVar,panel;
     z_index=List.ofSeq(Client.panelContainer().PanelItems).get_Length()+1;
     childPanelContainer=PanelContainer.get_Create().WithLayoutManager(LayoutManagers.StackPanelLayoutManager());
-    childPanel=Panel$1.get_Create().WithTitle(false).WithPannelAttrs([AttrModule.Style("position","absolute")]).WithPanelContent((a$19=[AttrModule.Class("panelContent"),AttrModule.Style("Width","150px")],(a$20=[Doc.TextNode("Content")],Doc.Element("div",a$19,a$20))));
+    childPanel=Panel$1.get_Create().WithTitle(false).WithPannelAttrs([AttrModule.Class("panelContent")]).WithPanelContent((a$19=[Doc.TextNode("Content")],Doc.Element("div",[],a$19))).WithWidth(150).WithHeight(150);
     childPanelContainer.AddPanel(childPanel);
     titleVar=Var.Create$1("Panel "+Global.String(z_index));
-    panel=Panel$1.get_Create().WithPannelAttrs([AttrModule.Style("Width","150px"),AttrModule.Style("position","absolute")]).WithTitleContent(Doc.TextView(titleVar.v)).WithTitleButtons(List.ofArray([TitleButton.New("add",function()
+    panel=Panel$1.get_Create().WithPannelAttrs([AttrModule.Style("position","absolute")]).WithTitleContent(Doc.TextView(titleVar.v)).WithTitleButtons(List.ofArray([TitleButton.New("add",function()
     {
     }),TitleButton.New("edit",function(panel$1)
     {
@@ -45,7 +45,7 @@
     }),TitleButton.New("clear",function(panel$1)
     {
      Client.panelContainer().PanelItems.Remove(Client.panelContainer().FindPanelItem(panel$1));
-    })])).WithChildPanelContainer(childPanelContainer).WithProperties(List.ofArray([Properties.string("title1",titleVar)]));
+    })])).WithChildPanelContainer(childPanelContainer).WithWidth(150).WithProperties(List.ofArray([Properties.string("title1",titleVar)]));
     return Client.panelContainer().AddPanel(panel);
    };
   })],(a$15=[Doc.TextNode("add")],Doc.Element("i",a$14,a$15)))],Doc.Element("td",[],a$13))],Doc.Element("tr",[],a$12)),(a$16=[(a$17=[Client.propertyGrid().get_Render()],Doc.Element("td",[],a$17))],Doc.Element("tr",[],a$16))],Doc.Element("table",[],a$5))],Doc.Element("td",a$3,a$4))),(a$18=[Client.panelContainer().get_Render()],Doc.Element("td",[],a$18))],Doc.Element("tr",[],a$2))],Doc.Element("table",[],a$1))];
