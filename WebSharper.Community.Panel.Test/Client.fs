@@ -17,6 +17,24 @@ module Client =
                                      .WithLayoutManager(LayoutManagers.FloatingPanelLayoutManager 5.0)
                                      //.WithLayoutManager(LayoutManagers.StackPanelLayoutManager)
                                      .WithAttributes([Attr.Style "border" "1px solid white"])
+    [<JavaScript>]
+    type ContentItem=
+        {
+            Text:string
+        }
+
+    [<JavaScript>]
+    type ContentModel=
+        {
+             Items : ListModel<string,ContentItem>
+        }
+        static member Create =
+            {   
+                Items=ListModel.Create (fun item ->item.Text) [{Text="Content 1"}]
+            }
+        member x.Render = 
+               x.Items.View
+              |> Doc.BindSeqCachedBy x.Items.Key (fun item-> div[text item.Text])
     let propertyGrid = PropertyGrid.Create
     let Main () =
         div [
@@ -35,10 +53,11 @@ module Client =
                                             on.mouseDown (fun _ _->let z_index=(panelContainer.PanelItems |>List.ofSeq).Length + 1
                                                                    let childPanelContainer = PanelContainer.Create
                                                                                                            .WithLayoutManager(LayoutManagers.StackPanelLayoutManager)
+                                                                   let contentItems=ContentModel.Create
                                                                    let childPanel=Panel.Create
                                                                                        .WithTitle(false)
                                                                                        .WithPannelAttrs([Attr.Class "panelContent"])
-                                                                                       .WithPanelContent(divAttr[][text "Content"])
+                                                                                       .WithPanelContent(contentItems.Render)
                                                                                        .WithWidth(150.0)
                                                                                        .WithHeight(150.0)
                                                                    childPanelContainer.AddPanel childPanel
@@ -48,7 +67,11 @@ module Client =
                                                                                   .WithTitleContent(textView titleVar.View)
                                                                                   .WithTitleButtons(
                                                                                                [
-                                                                                                 {Icon="add";Action=(fun panel->())}
+                                                                                                 {Icon="add";Action=(fun panel-> let index = (contentItems.Items |>List.ofSeq).Length
+                                                                                                                                 if index < 7 then
+                                                                                                                                    let item = {Text = "Content "+ (index + 1).ToString()}
+                                                                                                                                    contentItems.Items.Add item
+                                                                                                                                 )}
                                                                                                  {Icon="edit";Action=(fun panel->propertyGrid.Edit (panel.Properties))}
                                                                                                  {Icon="clear";Action=(fun panel->panelContainer.PanelItems.Remove(panelContainer.FindPanelItem panel))}
                                                                                                ])

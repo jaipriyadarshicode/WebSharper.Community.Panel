@@ -1,19 +1,24 @@
 (function()
 {
  "use strict";
- var Global,WebSharper,Community,Panel,Test,Client,SC$1,UI,Next,AttrModule,Doc,List,PanelContainer,LayoutManagers,Panel$1,Var,TitleButton,PropertyGrid,Properties,IntelliFactory,Runtime,PropertyGrid$1;
+ var Global,WebSharper,Community,Panel,Test,Client,ContentItem,ContentModel,SC$1,IntelliFactory,Runtime,UI,Next,Doc,List,ListModel,AttrModule,PanelContainer,LayoutManagers,Panel$1,Var,TitleButton,PropertyGrid,Properties,PropertyGrid$1;
  Global=window;
  WebSharper=Global.WebSharper=Global.WebSharper||{};
  Community=WebSharper.Community=WebSharper.Community||{};
  Panel=Community.Panel=Community.Panel||{};
  Test=Panel.Test=Panel.Test||{};
  Client=Test.Client=Test.Client||{};
+ ContentItem=Client.ContentItem=Client.ContentItem||{};
+ ContentModel=Client.ContentModel=Client.ContentModel||{};
  SC$1=Global.StartupCode$WebSharper_Community_Panel_Test$Client=Global.StartupCode$WebSharper_Community_Panel_Test$Client||{};
+ IntelliFactory=Global.IntelliFactory;
+ Runtime=IntelliFactory&&IntelliFactory.Runtime;
  UI=WebSharper&&WebSharper.UI;
  Next=UI&&UI.Next;
- AttrModule=Next&&Next.AttrModule;
  Doc=Next&&Next.Doc;
  List=WebSharper&&WebSharper.List;
+ ListModel=Next&&Next.ListModel;
+ AttrModule=Next&&Next.AttrModule;
  PanelContainer=Panel&&Panel.PanelContainer;
  LayoutManagers=Panel&&Panel.LayoutManagers;
  Panel$1=Panel&&Panel.Panel;
@@ -21,9 +26,41 @@
  TitleButton=Panel&&Panel.TitleButton;
  PropertyGrid=Community&&Community.PropertyGrid;
  Properties=PropertyGrid&&PropertyGrid.Properties;
- IntelliFactory=Global.IntelliFactory;
- Runtime=IntelliFactory&&IntelliFactory.Runtime;
  PropertyGrid$1=PropertyGrid&&PropertyGrid.PropertyGrid;
+ ContentItem.New=function(Text)
+ {
+  return{
+   Text:Text
+  };
+ };
+ ContentModel=Client.ContentModel=Runtime.Class({
+  get_Render:function()
+  {
+   var x,a;
+   x=this.Items.v;
+   a=this.Items.key;
+   return Doc.ConvertBy(a,function(item)
+   {
+    var a$1;
+    a$1=[Doc.TextNode(item.Text)];
+    return Doc.Element("div",[],a$1);
+   },x);
+  }
+ },null,ContentModel);
+ ContentModel.get_Create=function()
+ {
+  var a;
+  return ContentModel.New((a=List.ofArray([ContentItem.New("Content 1")]),ListModel.Create(function(item)
+  {
+   return item.Text;
+  },a)));
+ };
+ ContentModel.New=function(Items)
+ {
+  return new ContentModel({
+   Items:Items
+  });
+ };
  Client.Main=function()
  {
   var a,a$1,a$2,a$3,a$4,a$5,a$6,a$7,a$8,a$9,a$10,a$11,a$12,a$13,a$14,a$15,a$16,a$17,a$18;
@@ -31,14 +68,18 @@
   {
    return function()
    {
-    var z_index,childPanelContainer,childPanel,a$19,titleVar,panel;
+    var z_index,childPanelContainer,contentItems,childPanel,titleVar,panel;
     z_index=List.ofSeq(Client.panelContainer().PanelItems).get_Length()+1;
     childPanelContainer=PanelContainer.get_Create().WithLayoutManager(LayoutManagers.StackPanelLayoutManager());
-    childPanel=Panel$1.get_Create().WithTitle(false).WithPannelAttrs([AttrModule.Class("panelContent")]).WithPanelContent((a$19=[Doc.TextNode("Content")],Doc.Element("div",[],a$19))).WithWidth(150).WithHeight(150);
+    contentItems=ContentModel.get_Create();
+    childPanel=Panel$1.get_Create().WithTitle(false).WithPannelAttrs([AttrModule.Class("panelContent")]).WithPanelContent(contentItems.get_Render()).WithWidth(150).WithHeight(150);
     childPanelContainer.AddPanel(childPanel);
     titleVar=Var.Create$1("Panel "+Global.String(z_index));
     panel=Panel$1.get_Create().WithPannelAttrs([AttrModule.Style("position","absolute")]).WithTitleContent(Doc.TextView(titleVar.v)).WithTitleButtons(List.ofArray([TitleButton.New("add",function()
     {
+     var index,c;
+     index=List.ofSeq(contentItems.Items).get_Length();
+     index<7?contentItems.Items.Append(ContentItem.New("Content "+(c=index+1,Global.String(c)))):void 0;
     }),TitleButton.New("edit",function(panel$1)
     {
      Client.propertyGrid().Edit(panel$1.Properties);
