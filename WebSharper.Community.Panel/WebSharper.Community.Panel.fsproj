@@ -51,6 +51,7 @@
     <Compile Include="Panel.fs" />
     <Compile Include="Rect.fs" />
     <Compile Include="LayoutManagers.fs" />
+    <Compile Include="Dialog.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

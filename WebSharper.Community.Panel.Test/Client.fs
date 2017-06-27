@@ -36,6 +36,7 @@ module Client =
                x.Items.View
               |> Doc.BindSeqCachedBy x.Items.Key (fun item-> div[text item.Text])
     let propertyGrid = PropertyGrid.Create
+    let dlg = Dialog.Create
     let Main () =
         div [
             table[
@@ -47,6 +48,14 @@ module Client =
                                   [
                                     tdAttr[Attr.Style "Height" "100%"]
                                           [iAttr[Attr.Class "material-icons orange600"][text "dehaze"]]
+                                  ]
+                                trAttr[Attr.Style "Height" "100%"]
+                                  [
+                                    tdAttr[Attr.Style "Height" "100%"]
+                                          [iAttr[Attr.Class "material-icons orange600"
+                                                 Attr.Style "cursor" "pointer"
+                                                 on.mouseDown (fun _ _-> dlg.ShowDialog "Dialog title" (div[text "Content"]) )
+                                                 ][text "announcement"]]
                                   ]
                                 tr[td[iAttr[Attr.Class "material-icons orange600"
                                             Attr.Style "cursor" "pointer"
@@ -85,7 +94,8 @@ module Client =
                                                                    )][text "add"]
                                       ]
                                     ]
-                                tr[td[propertyGrid.Render]]
+                                tr[td[ dlg.Render
+                                       propertyGrid.Render]]
                              ]
                       ]
                     td[panelContainer.Render]
