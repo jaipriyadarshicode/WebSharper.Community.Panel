@@ -54,7 +54,7 @@ module Client =
                                     tdAttr[Attr.Style "Height" "100%"]
                                           [iAttr[Attr.Class "material-icons orange600"
                                                  Attr.Style "cursor" "pointer"
-                                                 on.mouseDown (fun _ _-> dlg.ShowDialog "Dialog title" (div[text "Content"]) )
+                                                 on.mouseDown (fun _ _-> dlg.ShowDialog "Dialog title" (div[text "Content"]) (fun () -> ()))
                                                  ][text "announcement"]]
                                   ]
                                 tr[td[iAttr[Attr.Class "material-icons orange600"
@@ -81,7 +81,7 @@ module Client =
                                                                                                                                     let item = {Text = "Content "+ (index + 1).ToString()}
                                                                                                                                     contentItems.Items.Add item
                                                                                                                                  )}
-                                                                                                 {Icon="edit";Action=(fun panel->propertyGrid.Edit (panel.Properties))}
+                                                                                                 {Icon="edit";Action=(fun panel->panel.EditProperties propertyGrid)}
                                                                                                  {Icon="clear";Action=(fun panel->panelContainer.PanelItems.Remove(panelContainer.FindPanelItem panel))}
                                                                                                ])
                                                                                   //.WithPanelContent(divAttr[Attr.Class "panelContent"][text "Content"])

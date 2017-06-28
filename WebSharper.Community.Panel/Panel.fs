@@ -72,7 +72,12 @@ and [<JavaScript>] Panel =
     member x.WithProperties properties = {x with Properties = properties}
     member x.WithWidth cx = {x with Width = cx } //Var.Create cx}
     member x.WithHeight cy = {x with Height = cy } //Var.Create cy}
-
+    member x.EditProperties (propGrid:PropertyGrid) = 
+                List.concat [
+                        x.Properties
+                        x.Children.PanelItems |>List.ofSeq |> List.map (fun childPanel -> childPanel.Properties) |> List.concat
+                        ]
+                |> propGrid.Edit
     member x.Render =
         let dragActive = Var.Create false
         let mouseOverVar = Var.Create false

@@ -204,6 +204,17 @@
     $this.onAfterRender($this);
    });
   },
+  EditProperties:function(propGrid)
+  {
+   var m;
+   propGrid.Edit(List.concat([this.Properties,List.concat((m=function(childPanel)
+   {
+    return childPanel.Properties;
+   },function(l)
+   {
+    return List.map(m,l);
+   }(List.ofSeq(this.Children.PanelItems))))]));
+  },
   WithHeight:function(cy)
   {
    return Panel$1.New(this.Key,this.Left,this.Top,this.Width,cy,this.Element,this.Relayout,this.PannelAttrs,this.IsWithTitle,this.TitleAttrs,this.TitleContent,this.TitleButtons,this.PanelContent,this.Children,this.InternalName,this.onAfterRender,this.Properties);
@@ -663,47 +674,48 @@
    {
     return function()
     {
-     var a$16,a$17;
-     a$16=$this.IsOK;
+     var a$16;
+     a$16=$this.Visibility;
      Var.Set(a$16,false);
-     a$17=$this.Visibility;
-     return Var.Set(a$17,false);
+     return $this.OKCallback.c();
     };
    })],(a$12=[Doc.TextNode("OK")],Doc.Element("button",a$11,a$12)))],Doc.Element("td",[],a$10)),(a$13=[(a$14=[AttrModule.Handler("click",function()
    {
     return function()
     {
-     var a$16,a$17;
-     a$16=$this.IsOK;
-     Var.Set(a$16,false);
-     a$17=$this.Visibility;
-     return Var.Set(a$17,false);
+     var a$16;
+     a$16=$this.Visibility;
+     return Var.Set(a$16,false);
     };
    })],(a$15=[Doc.TextNode("Cancel")],Doc.Element("button",a$14,a$15)))],Doc.Element("td",[],a$13))],Doc.Element("tr",[],a$9))],Doc.Element("table",[],a$3))];
    return Doc.Element("div",a,a$2);
   },
-  ShowDialog:function(title,content)
+  ShowDialog:function(title,content,okCallback)
   {
-   var a,a$1,a$2;
+   var a,a$1,a$2,a$3;
    a=this.Title;
    Var.Set(a,title);
    a$1=this.Content;
    Var.Set(a$1,content);
    a$2=this.Visibility;
    Var.Set(a$2,true);
+   a$3=this.OKCallback;
+   Var.Set(a$3,okCallback);
   }
  },null,Dialog);
  Dialog.get_Create=function()
  {
-  return Dialog.New(Var.Create$1(""),Var.Create$1(Doc.Element("div",[],[])),Var.Create$1(false),Var.Create$1(false));
+  return Dialog.New(Var.Create$1(""),Var.Create$1(Doc.Element("div",[],[])),Var.Create$1(false),Var.Create$1(function()
+  {
+  }));
  };
- Dialog.New=function(Title,Content,Visibility,IsOK)
+ Dialog.New=function(Title,Content,Visibility,OKCallback)
  {
   return new Dialog({
    Title:Title,
    Content:Content,
    Visibility:Visibility,
-   IsOK:IsOK
+   OKCallback:OKCallback
   });
  };
 }());

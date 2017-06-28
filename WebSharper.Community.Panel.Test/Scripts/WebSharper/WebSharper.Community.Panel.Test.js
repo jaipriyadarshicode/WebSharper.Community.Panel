@@ -71,7 +71,9 @@
    {
     var a$25,a$26;
     a$25=(a$26=[Doc.TextNode("Content")],Doc.Element("div",[],a$26));
-    return Client.dlg().ShowDialog("Dialog title",a$25);
+    return Client.dlg().ShowDialog("Dialog title",a$25,function()
+    {
+    });
    };
   })],(a$17=[Doc.TextNode("announcement")],Doc.Element("i",a$16,a$17)))],Doc.Element("td",a$14,a$15)))],Doc.Element("tr",a$12,a$13))),(a$18=[(a$19=[(a$20=[AttrModule.Class("material-icons orange600"),AttrModule.Style("cursor","pointer"),AttrModule.Handler("mousedown",function()
   {
@@ -91,7 +93,7 @@
      index<7?contentItems.Items.Append(ContentItem.New("Content "+(c=index+1,Global.String(c)))):void 0;
     }),TitleButton.New("edit",function(panel$1)
     {
-     Client.propertyGrid().Edit(panel$1.Properties);
+     panel$1.EditProperties(Client.propertyGrid());
     }),TitleButton.New("clear",function(panel$1)
     {
      Client.panelContainer().PanelItems.Remove(Client.panelContainer().FindPanelItem(panel$1));
