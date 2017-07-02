@@ -34,19 +34,27 @@ module Client =
             }
         member x.Render = 
                x.Items.View
-              |> Doc.BindSeqCachedBy x.Items.Key (fun item-> div[text item.Text])
+              |> Doc.BindSeqCachedBy x.Items.Key (fun item-> div[text item.Text]) 
     let propertyGrid = PropertyGrid.Create
     let dlg = Dialog.Create
+    let isExpanded = Var.Create false
     let Main () =
-        div [
+      div[
+       divAttr[Attr.DynamicStyle "pointer-events" (View.Map (fun _ -> if dlg.Visibility.Value then "none" else "auto") dlg.Visibility.View)]
+         [
             table[
                 tr[
-                    tdAttr [Attr.Style "vertical-align" "top"][
+                    tdAttr [Attr.Style "vertical-align" "top"
+                            Attr.DynamicStyle "Width" (View.Map (fun isExpanded -> if isExpanded then "100px" else "0px") isExpanded.View)
+                           ][
                         table
                              [
                                 trAttr[Attr.Style "Height" "100%"]
                                   [
-                                    tdAttr[Attr.Style "Height" "100%"]
+                                    tdAttr[Attr.Style "Height" "100%"
+                                           Attr.Style "cursor" "pointer"
+                                           on.click(fun _ _ -> if not isExpanded.Value then isExpanded.Value <- true) 
+                                          ]
                                           [iAttr[Attr.Class "material-icons orange600"][text "dehaze"]]
                                   ]
                                 trAttr[Attr.Style "Height" "100%"]
@@ -54,8 +62,11 @@ module Client =
                                     tdAttr[Attr.Style "Height" "100%"]
                                           [iAttr[Attr.Class "material-icons orange600"
                                                  Attr.Style "cursor" "pointer"
-                                                 on.mouseDown (fun _ _-> dlg.ShowDialog "Dialog title" (div[text "Content"]) (fun () -> ()))
-                                                 ][text "announcement"]]
+                                                 on.mouseDown (fun _ _-> dlg.ShowDialog "Dialog title" (div[text "Content"]))
+                                                 ]
+                                                 [text "announcement"]
+                                          ]
+
                                   ]
                                 tr[td[iAttr[Attr.Class "material-icons orange600"
                                             Attr.Style "cursor" "pointer"
@@ -81,7 +92,7 @@ module Client =
                                                                                                                                     let item = {Text = "Content "+ (index + 1).ToString()}
                                                                                                                                     contentItems.Items.Add item
                                                                                                                                  )}
-                                                                                                 {Icon="edit";Action=(fun panel->panel.EditProperties propertyGrid)}
+                                                                                                 {Icon="edit";Action=(fun panel->propertyGrid.Edit (panel.Properties))}
                                                                                                  {Icon="clear";Action=(fun panel->panelContainer.PanelItems.Remove(panelContainer.FindPanelItem panel))}
                                                                                                ])
                                                                                   //.WithPanelContent(divAttr[Attr.Class "panelContent"][text "Content"])
@@ -94,11 +105,16 @@ module Client =
                                                                    )][text "add"]
                                       ]
                                     ]
-                                tr[td[ dlg.Render
-                                       propertyGrid.Render]]
+                                tr[td[propertyGrid.Render]]
                              ]
                       ]
                     td[panelContainer.Render]
                   ]
             ]
         ]
+       div[
+          table[
+             tr[td[dlg.Render]]
+           ]
+        ]
+      ]
