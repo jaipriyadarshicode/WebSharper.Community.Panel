@@ -1,0 +1,36 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+    background-color:black;
+}
+div.panelTitle {
+    background-color:#404040;
+    color:rgb(200,200,200);
+    height:20px;
+}
+div.panelContent {
+    background-color:#808080;
+}   
+div.propertyGrid td
+{
+    background-color:white;
+    border:solid 1px darkgray;
+}
+div.propertyGrid input
+{
+    border:0px;
+    height:18px;
+}         
+.material-icons.orange600 { 
+    color: #FB8C00; 
+} 
+.material-icons.orange600.small { 
+    font-size: 15px;
+}            
+.container .text-muted {
+    margin: 20px 0;
+}
