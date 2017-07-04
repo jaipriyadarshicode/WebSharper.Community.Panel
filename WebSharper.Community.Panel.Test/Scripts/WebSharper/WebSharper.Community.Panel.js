@@ -661,33 +661,33 @@
  Dialog=Panel.Dialog=Runtime.Class({
   get_Render:function()
   {
-   var $this,a,a$1,a$2,a$3,a$4,a$5,a$6,a$7,a$8,a$9,a$10,a$11,a$12,a$13,a$14,a$15,a$16,a$17,a$18,a$19,a$20;
+   var $this,a,a$1,a$2,a$3,a$4,a$5,a$6,a$7,a$8,a$9,a$10,a$11,a$12,a$13,a$14,a$15;
    $this=this;
    a=[AttrModule.Style("position","absolute"),AttrModule.Style("left","50%"),AttrModule.Style("top","50%"),AttrModule.Style("z-index","1"),AttrModule.Style("background-color","white"),AttrModule.Style("min-height","100px"),AttrModule.Style("min-width","200px"),AttrModule.DynamicStyle("display",(a$1=this.Visibility.v,View.Map(function(isVis)
    {
     return isVis?"block":"none";
    },a$1)))];
-   a$2=[(a$3=[AttrModule.Style("background-color","grey"),AttrModule.Style("display","block"),AttrModule.Style("min-height","100px"),AttrModule.Style("min-width","200px")],(a$4=[(a$5=[(a$6=[AttrModule.Style("border-style","hidden"),AttrModule.Style("background","#404040"),AttrModule.Style("color","rgb(200,200,200)"),AttrModule.Style("padding","0px 2px 5px 2px"),AttrModule.Style("font-size","medium")],(a$7=[Doc.TextView(this.Title.v)],Doc.Element("td",a$6,a$7)))],Doc.Element("tr",[],a$5)),(a$8=[(a$9=[AttrModule.Style("padding","5px 0px 0px 2px")],(a$10=[(a$11=Global.id,function(a$21)
+   a$2=[(a$3=[(a$4=[(a$5=[Doc.TextView(this.Title.v)],Doc.Element("td",[],a$5))],Doc.Element("tr",[],a$4)),(a$6=[(a$7=[(a$8=Global.id,function(a$16)
    {
-    return Doc.BindView(a$11,a$21);
-   }(this.Content.v))],Doc.Element("td",a$9,a$10)))],Doc.Element("tr",[],a$8)),(a$12=[(a$13=[AttrModule.Style("padding","20px 12px 2px 20px")],(a$14=[(a$15=[AttrModule.Style("border-radius","2px"),AttrModule.Handler("click",function()
+    return Doc.BindView(a$8,a$16);
+   }(this.Content.v))],Doc.Element("td",[],a$7))],Doc.Element("tr",[],a$6)),(a$9=[(a$10=[(a$11=[AttrModule.Handler("click",function()
    {
     return function()
     {
-     var a$21;
-     a$21=$this.Visibility;
-     Var.Set(a$21,false);
+     var a$16;
+     a$16=$this.Visibility;
+     Var.Set(a$16,false);
      return $this.OKCallback.c();
     };
-   })],(a$16=[Doc.TextNode("OK")],Doc.Element("button",a$15,a$16)))],Doc.Element("td",a$13,a$14))),(a$17=[AttrModule.Style("padding","20px 12px 2px 50px")],(a$18=[(a$19=[AttrModule.Style("border-radius","2px"),AttrModule.Handler("click",function()
+   })],(a$12=[Doc.TextNode("OK")],Doc.Element("button",a$11,a$12)))],Doc.Element("td",[],a$10)),(a$13=[(a$14=[AttrModule.Handler("click",function()
    {
     return function()
     {
-     var a$21;
-     a$21=$this.Visibility;
-     return Var.Set(a$21,false);
+     var a$16;
+     a$16=$this.Visibility;
+     return Var.Set(a$16,false);
     };
-   })],(a$20=[Doc.TextNode("Cancel")],Doc.Element("button",a$19,a$20)))],Doc.Element("td",a$17,a$18)))],Doc.Element("tr",[],a$12))],Doc.Element("table",a$3,a$4)))];
+   })],(a$15=[Doc.TextNode("Cancel")],Doc.Element("button",a$14,a$15)))],Doc.Element("td",[],a$13))],Doc.Element("tr",[],a$9))],Doc.Element("table",[],a$3))];
    return Doc.Element("div",a,a$2);
   },
   ShowDialog:function(title,content,okCallback)
