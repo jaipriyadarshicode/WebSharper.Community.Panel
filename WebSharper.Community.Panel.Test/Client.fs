@@ -40,7 +40,9 @@ module Client =
     let isExpanded = Var.Create false
     let Main () =
       div[
-       divAttr[Attr.DynamicStyle "pointer-events" (View.Map (fun _ -> if dlg.Visibility.Value then "none" else "auto") dlg.Visibility.View)]
+       divAttr[Attr.DynamicStyle "pointer-events" (View.Map (fun _ -> if dlg.Visibility.Value then "none" else "auto") dlg.Visibility.View)
+               Attr.DynamicStyle "opacity" (View.Map(fun _ -> if dlg.Visibility.Value then "0.5" else "1" ) dlg.Visibility.View)
+              ]
          [
             table[
                 tr[
@@ -66,12 +68,11 @@ module Client =
                                                  ]
                                                  [text "announcement"]
                                           ]
-                                    (*tdAttr[Attr.DynamicStyle "display" (View.Map (fun _ -> if not (isExpanded.Value) then "none" else "block") isExpanded.View)
+                                    tdAttr[Attr.DynamicStyle "display" (View.Map (fun _ -> if not (isExpanded.Value) then "none" else "block") isExpanded.View)
                                            Attr.Style "color" "White"
-                                           Attr.Style "font-weight" "bold"
                                            Attr.Style "margin-left" "15px"
-                                          ]
-                                          [text "Dialog"]*)
+                                           Attr.Style "Width" "75px"
+                                          ][text "Dialog"]
 
                                   ]
                                 tr[td[iAttr[Attr.Class "material-icons orange600"
@@ -111,9 +112,16 @@ module Client =
                                                                    panelContainer.AddPanel panel
                                                                    )][text "add"]
                                       ]
+                                   tdAttr[Attr.DynamicStyle "display" (View.Map (fun _ -> if not (isExpanded.Value) then "none" else "block") isExpanded.View)
+                                          Attr.Style "color" "White"
+                                          Attr.Style "margin-left" "15px"
+                                          Attr.Style "Width" "75px"
+                                          ][text "Add Panel"]
                                     ]
-                                tr[td[propertyGrid.Render]]
                              ]
+                        table[
+                            tr[td[propertyGrid.Render]]
+                         ]
                       ]
                     td[panelContainer.Render]
                   ]
