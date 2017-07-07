@@ -43,23 +43,28 @@ type Dialog =
                      Attr.Style "min-height" "100px"
                      Attr.Style "min-width" "200px" 
                   ]
-                    [   
+                    [  
+                      table[ 
                         tr[tdAttr[Attr.Style "border-style" "hidden"
                                   Attr.Style "background" "#404040"
                                   Attr.Style "color" "rgb(200,200,200)"
                                   Attr.Style "padding" "0px 2px 5px 2px"
+                                  Attr.Style "Width" "200px"
                                   Attr.Style "font-size" "medium"][textView x.Title.View]]
-                        tr[tdAttr[Attr.Style "padding" "5px 0px 0px 2px"][x.Content.View |> Doc.BindView (fun content->content)]]
-                        tr[
+                      ]
+                      table[
+                         tr[tdAttr[Attr.Style "padding" "5px 0px 0px 2px"][x.Content.View |> Doc.BindView (fun content->content)]]
+                         tr[
                             tdAttr [Attr.Style "padding" "20px 12px 2px 20px"][
                                 buttonAttr [Attr.Style "border-radius" "2px"
                                             on.click (fun _ _ ->x.Visibility.Value <-false
                                                                 x.OKCallback.Value())] [text "OK"]
-                              ]
+                             ]
                             tdAttr [Attr.Style "padding" "20px 12px 2px 50px"] [
                                 buttonAttr [Attr.Style "border-radius" "2px"
                                             on.click (fun _ _ -> x.Visibility.Value<-false)] [text "Cancel"]
-                              ]      
-                        ]
+                              ] 
+                         ]     
+                      ]
                     ]
             ]
