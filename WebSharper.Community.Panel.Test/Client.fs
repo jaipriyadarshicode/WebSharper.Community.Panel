@@ -51,23 +51,9 @@ module Client =
                            ][
                         table
                              [
-                                trAttr[Attr.Style "Height" "100%"]
-                                  [
-                                    tdAttr[Attr.Style "Height" "100%"
-                                           Attr.Style "cursor" "pointer"
-                                           on.click(fun _ _ -> if not isExpanded.Value then isExpanded.Value <- true else isExpanded.Value <- false) 
-                                          ]
-                                          [iAttr[Attr.Class "material-icons orange600"][text "dehaze"]]
-                                  ]
-                                trAttr[Attr.Style "Height" "100%"]
-                                  [
-                                    tdAttr[Attr.Style "Height" "100%"]
-                                          [iAttr[Attr.Class "material-icons orange600"
-                                                 Attr.Style "cursor" "pointer"
-                                                 on.mouseDown (fun _ _-> dlg.ShowDialog "Dialog title" (div[text "Content"]) (fun () -> ()))
-                                                 ]
-                                                 [text "announcement"]
-                                          ]
+                                tr[td[Helper.IconNormal "dehaze" (fun _ -> if not isExpanded.Value then isExpanded.Value <- true else isExpanded.Value <- false) ]]
+                                tr[
+                                    td[Helper.IconNormal "announcement" (fun _ -> dlg.ShowDialog "Dialog title" (div[text "Content"]) (fun () -> ()))]
                                     tdAttr[Attr.DynamicStyle "display" (View.Map (fun _ -> if not (isExpanded.Value) then "none" else "block") isExpanded.View)
                                            Attr.Style "color" "White"
                                            Attr.Style "margin-left" "15px"
@@ -75,9 +61,8 @@ module Client =
                                           ][text "Dialog"]
 
                                   ]
-                                tr[td[iAttr[Attr.Class "material-icons orange600"
-                                            Attr.Style "cursor" "pointer"
-                                            on.mouseDown (fun _ _->let z_index=(panelContainer.PanelItems |>List.ofSeq).Length + 1
+                                tr[td[Helper.IconNormal "add"
+                                                           (fun _->let z_index=(panelContainer.PanelItems |>List.ofSeq).Length + 1
                                                                    let childPanelContainer = PanelContainer.Create
                                                                                                            .WithLayoutManager(LayoutManagers.StackPanelLayoutManager)
                                                                    let contentItems=ContentModel.Create
@@ -110,8 +95,8 @@ module Client =
                                                                                                     Properties.string "title1" titleVar
                                                                                                   ])
                                                                    panelContainer.AddPanel panel
-                                                                   )][text "add"]
-                                      ]
+                                                                   )]
+                                      
                                    tdAttr[Attr.DynamicStyle "display" (View.Map (fun _ -> if not (isExpanded.Value) then "none" else "block") isExpanded.View)
                                           Attr.Style "color" "White"
                                           Attr.Style "margin-left" "15px"

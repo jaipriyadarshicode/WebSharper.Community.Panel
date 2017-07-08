@@ -6,7 +6,6 @@ open WebSharper.UI.Next
 open WebSharper.UI.Next.Client
 open WebSharper.UI.Next.Html
 open WebSharper.Community.PropertyGrid
-//open WebSharper.UI.Next.Input
 
 [<JavaScript>]
 type TitleButton =
@@ -15,10 +14,8 @@ type TitleButton =
         Action:Panel->unit            
     }
     member x.Render panel=
-        iAttr[Attr.Class "material-icons orange600 small"
-              Attr.Style "cursor" "pointer"
-              on.click (fun elem _->x.Action panel)
-              ][text x.Icon]:>Doc
+        Helper.IconSmall  x.Icon (fun _ -> x.Action panel)
+
 and [<JavaScript>] Panel =
     {
         Key:Key
