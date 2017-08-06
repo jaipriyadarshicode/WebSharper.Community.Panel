@@ -1,7 +1,7 @@
 (function()
 {
  "use strict";
- var WebSharper,Community,Panel,Helper,TitleButton,Panel$1,PanelContainer,Rect,LayoutManagers,SC$1,Dialog,UI,Next,Doc,List,AttrModule,IntelliFactory,Runtime,Var,Unchecked,View,Input,Mouse,Seq,Key,ListModel,console;
+ var WebSharper,Community,Panel,Helper,TitleButton,Panel$1,PanelContainer,Rect,LayoutManagers,SC$1,Dialog,UI,Next,Doc,List,AttrModule,IntelliFactory,Runtime,Var,Unchecked,View,Input,Mouse,Seq,Guid,ListModel,console;
  WebSharper=window.WebSharper=window.WebSharper||{};
  Community=WebSharper.Community=WebSharper.Community||{};
  Panel=Community.Panel=Community.Panel||{};
@@ -26,7 +26,7 @@
  Input=Next&&Next.Input;
  Mouse=Input&&Input.Mouse;
  Seq=WebSharper&&WebSharper.Seq;
- Key=Next&&Next.Key;
+ Guid=WebSharper&&WebSharper.Guid;
  ListModel=Next&&Next.ListModel;
  console=window.console;
  Helper.IconSmall=function(id,action)
@@ -249,16 +249,17 @@
  },null,Panel$1);
  Panel$1.get_Create=function()
  {
-  return Panel$1.New(Key.Fresh(),Var.Create$1(0),Var.Create$1(0),0,0,Var.Create$1(null),function()
+  var c;
+  return Panel$1.New((c=Guid.NewGuid(),window.String(c)),Var.Create$1(0),Var.Create$1(0),0,0,Var.Create$1(null),function()
   {
   },List.T.Empty,true,List.ofArray([AttrModule.Class("panelTitle")]),Doc.Element("div",[],[]),List.T.Empty,Doc.Element("div",[],[]),PanelContainer.get_Create(),"",function()
   {
   },List.T.Empty);
  };
- Panel$1.New=function(Key$1,Left,Top,Width,Height,Element,Relayout,PannelAttrs,IsWithTitle,TitleAttrs,TitleContent,TitleButtons,PanelContent,Children,InternalName,onAfterRender,Properties)
+ Panel$1.New=function(Key,Left,Top,Width,Height,Element,Relayout,PannelAttrs,IsWithTitle,TitleAttrs,TitleContent,TitleButtons,PanelContent,Children,InternalName,onAfterRender,Properties)
  {
   return new Panel$1({
-   Key:Key$1,
+   Key:Key,
    Left:Left,
    Top:Top,
    Width:Width,
@@ -444,11 +445,11 @@
   panelItems=panelContainer.PanelItems;
   exceptPanelItem=Seq.find(function(panelItem)
   {
-   return Unchecked.Equals(panelItem.Key,exceptPanel.Key);
+   return panelItem.Key===exceptPanel.Key;
   },List.ofSeq(panelItems));
   foundPanel=Seq.tryFind(function(panelItem)
   {
-   return!Unchecked.Equals(panelItem.Key,exceptPanelItem.Key)&&!Rect.fromPanel(panelItem).intersect(Rect.fromPanel(exceptPanelItem)).get_isEmpty();
+   return panelItem.Key!==exceptPanelItem.Key&&!Rect.fromPanel(panelItem).intersect(Rect.fromPanel(exceptPanelItem)).get_isEmpty();
   },List.ofSeq(panelItems));
   foundPanel!=null&&foundPanel.$==1?LayoutManagers.movePanelToFreeSpace(panelItems,foundPanel.$0,margin):void 0;
  };
@@ -477,7 +478,7 @@
   var x;
   x=List.filter(function(item)
   {
-   return!Unchecked.Equals(item.Key,except.Key);
+   return item.Key!==except.Key;
   },List.ofSeq(panelItems));
   return Seq.fold(function(acc,panel)
   {
@@ -512,7 +513,7 @@
      {
       rest=lst.$1;
       head=lst.$0;
-      if(Unchecked.Equals(head.Key,stopItem.Key))
+      if(head.Key===stopItem.Key)
        return acc;
       else
        {
