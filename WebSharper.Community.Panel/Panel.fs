@@ -18,7 +18,7 @@ type TitleButton =
 
 and [<JavaScript>] Panel =
     {
-        Key:Key
+        Key:string
         Left:Var<double>
         Top:Var<double>
         Width:double
@@ -38,7 +38,7 @@ and [<JavaScript>] Panel =
     }
     static member Create =
         {   
-            Key=Key.Fresh()
+            Key=System.Guid.NewGuid().ToString() //Key.Fresh()
             Left = Var.Create 0.0
             Top = Var.Create 0.0
             Width = 0.0
@@ -180,7 +180,7 @@ and [<JavaScript>] PanelContainer =
     {
         Width:double //Var<double>
         Height:double //Var<double>
-        PanelItems : ListModel<Key,Panel>
+        PanelItems : ListModel<string,Panel>
         LayoutManager : ILayoutManager 
         ContainerAttributes :seq<Attr>
     }
