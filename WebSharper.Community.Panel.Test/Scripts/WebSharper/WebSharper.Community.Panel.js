@@ -1,11 +1,12 @@
 (function()
 {
  "use strict";
- var WebSharper,Community,Panel,Helper,TitleButton,Panel$1,PanelContainer,Rect,LayoutManagers,SC$1,Dialog,UI,Next,Doc,List,AttrModule,IntelliFactory,Runtime,Var,Unchecked,View,Input,Mouse,Seq,Guid,ListModel,console;
+ var WebSharper,Community,Panel,Helper,PanelData,TitleButton,Panel$1,PanelContainer,Rect,LayoutManagers,SC$1,Dialog,Guid,UI,Next,Doc,AttrModule,List,IntelliFactory,Runtime,Var,Unchecked,View,Input,Mouse,Seq,ListModel,console;
  WebSharper=window.WebSharper=window.WebSharper||{};
  Community=WebSharper.Community=WebSharper.Community||{};
  Panel=Community.Panel=Community.Panel||{};
  Helper=Panel.Helper=Panel.Helper||{};
+ PanelData=Panel.PanelData=Panel.PanelData||{};
  TitleButton=Panel.TitleButton=Panel.TitleButton||{};
  Panel$1=Panel.Panel=Panel.Panel||{};
  PanelContainer=Panel.PanelContainer=Panel.PanelContainer||{};
@@ -13,11 +14,12 @@
  LayoutManagers=Panel.LayoutManagers=Panel.LayoutManagers||{};
  SC$1=window.StartupCode$WebSharper_Community_Panel$LayoutManagers=window.StartupCode$WebSharper_Community_Panel$LayoutManagers||{};
  Dialog=Panel.Dialog=Panel.Dialog||{};
+ Guid=WebSharper&&WebSharper.Guid;
  UI=WebSharper&&WebSharper.UI;
  Next=UI&&UI.Next;
  Doc=Next&&Next.Doc;
- List=WebSharper&&WebSharper.List;
  AttrModule=Next&&Next.AttrModule;
+ List=WebSharper&&WebSharper.List;
  IntelliFactory=window.IntelliFactory;
  Runtime=IntelliFactory&&IntelliFactory.Runtime;
  Var=Next&&Next.Var;
@@ -26,9 +28,22 @@
  Input=Next&&Next.Input;
  Mouse=Input&&Input.Mouse;
  Seq=WebSharper&&WebSharper.Seq;
- Guid=WebSharper&&WebSharper.Guid;
  ListModel=Next&&Next.ListModel;
  console=window.console;
+ Helper.UniqueKey=function()
+ {
+  var c;
+  c=Guid.NewGuid();
+  return window.String(c);
+ };
+ Helper.TxtIconNormal=function(id,txt,action)
+ {
+  return Helper.TxtIcon("material-icons orange600",id,txt,action);
+ };
+ Helper.TxtIcon=function(className,id,txt,action)
+ {
+  return Doc.Element("div",Helper.AttrsClick(action),[Doc.Element("i",[AttrModule.Class(className)],[Doc.TextNode(id)]),Doc.TextNode(txt)]);
+ };
  Helper.IconSmall=function(id,action)
  {
   return Helper.Icon("material-icons orange600 small",id,action);
@@ -54,6 +69,19 @@
     return action();
    };
   })]);
+ };
+ PanelData.Create=function(key,left,top,children)
+ {
+  return PanelData.New(key,left,top,children);
+ };
+ PanelData.New=function(Key,Left,Top,Children)
+ {
+  return{
+   Key:Key,
+   Left:Left,
+   Top:Top,
+   Children:Children
+  };
  };
  TitleButton=Panel.TitleButton=Runtime.Class({
   Render:function(panel)
@@ -187,6 +215,13 @@
     $this.onAfterRender($this);
    });
   },
+  get_PanelData:function()
+  {
+   return PanelData.Create(this.Key,this.Left.c,this.Top.c,List.map(function(panel)
+   {
+    return panel.get_PanelData();
+   },List.ofSeq(this.Children.PanelItems)));
+  },
   EditProperties:function(propGrid)
   {
    propGrid.Edit(List.concat([this.Properties,List.concat(List.map(function(childPanel)
@@ -245,6 +280,10 @@
   WithPannelAttrs:function(attrs)
   {
    return Panel$1.New(this.Key,this.Left,this.Top,this.Width,this.Height,this.Element,this.Relayout,attrs,this.IsWithTitle,this.TitleAttrs,this.TitleContent,this.TitleButtons,this.PanelContent,this.Children,this.InternalName,this.onAfterRender,this.Properties);
+  },
+  WithKey:function(key)
+  {
+   return Panel$1.New(key,this.Left,this.Top,this.Width,this.Height,this.Element,this.Relayout,this.PannelAttrs,this.IsWithTitle,this.TitleAttrs,this.TitleContent,this.TitleButtons,this.PanelContent,this.Children,this.InternalName,this.onAfterRender,this.Properties);
   }
  },null,Panel$1);
  Panel$1.get_Create=function()
