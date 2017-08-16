@@ -1,16 +1,17 @@
 (function()
 {
  "use strict";
- var WebSharper,Community,Panel,Test,Client,ContentItem,ContentModel,SC$1,IntelliFactory,Runtime,UI,Next,Doc,ListModel,List,AttrModule,View,Helper,Var,PanelContainer,LayoutManagers,Panel$1,TitleButton,PropertyGrid,Properties,PropertyGrid$1,Dialog;
- WebSharper=window.WebSharper=window.WebSharper||{};
+ var Global,WebSharper,Community,Panel,Test,Client,ContentItem,ContentModel,SC$1,IntelliFactory,Runtime,UI,Next,Doc,ListModel,List,AttrModule,View,Helper,Var,PanelContainer,LayoutManagers,Panel$1,TitleButton,PropertyGrid,Properties,PropertyGrid$1,Dialog;
+ Global=window;
+ WebSharper=Global.WebSharper=Global.WebSharper||{};
  Community=WebSharper.Community=WebSharper.Community||{};
  Panel=Community.Panel=Community.Panel||{};
  Test=Panel.Test=Panel.Test||{};
  Client=Test.Client=Test.Client||{};
  ContentItem=Client.ContentItem=Client.ContentItem||{};
  ContentModel=Client.ContentModel=Client.ContentModel||{};
- SC$1=window.StartupCode$WebSharper_Community_Panel_Test$Client=window.StartupCode$WebSharper_Community_Panel_Test$Client||{};
- IntelliFactory=window.IntelliFactory;
+ SC$1=Global.StartupCode$WebSharper_Community_Panel_Test$Client=Global.StartupCode$WebSharper_Community_Panel_Test$Client||{};
+ IntelliFactory=Global.IntelliFactory;
  Runtime=IntelliFactory&&IntelliFactory.Runtime;
  UI=WebSharper&&WebSharper.UI;
  Next=UI&&UI.Next;
@@ -78,9 +79,7 @@
   {
    var a;
    a=Doc.Element("div",[],[Doc.TextNode("Content")]);
-   Client.dlg().ShowDialog("Dialog title",a,function()
-   {
-   });
+   Client.dlg().ShowDialog("Dialog title",a,Global.ignore);
   })]),Doc.Element("td",[AttrModule.DynamicStyle("display",View.Map(function()
   {
    return!Client.isExpanded().c?"none":"block";
@@ -91,12 +90,12 @@
    childPanelContainer=PanelContainer.get_Create().WithLayoutManager(LayoutManagers.StackPanelLayoutManager());
    contentItems=ContentModel.get_Create();
    childPanelContainer.AddPanel(Panel$1.get_Create().WithTitle(false).WithPannelAttrs([AttrModule.Class("panelContent")]).WithPanelContent(contentItems.get_Render()).WithWidth(150).WithHeight(150));
-   titleVar=Var.Create$1("Panel "+window.String(z_index));
+   titleVar=Var.Create$1("Panel "+Global.String(z_index));
    panel=Panel$1.get_Create().WithPannelAttrs([AttrModule.Style("position","absolute")]).WithTitleContent(Doc.TextView(titleVar.v)).WithTitleButtons(List.ofArray([TitleButton.New("add",function()
    {
     var index,c;
     index=List.ofSeq(contentItems.Items).get_Length();
-    index<7?contentItems.Items.Append(ContentItem.New("Content "+(c=index+1,window.String(c)))):void 0;
+    index<7?contentItems.Items.Append(ContentItem.New("Content "+(c=index+1,Global.String(c)))):void 0;
    }),TitleButton.New("edit",function(panel$1)
    {
     panel$1.EditProperties(Client.propertyGrid());
@@ -136,6 +135,6 @@
   SC$1.propertyGrid=PropertyGrid$1.get_Create();
   SC$1.dlg=Dialog.get_Create();
   SC$1.isExpanded=Var.Create$1(false);
-  SC$1.$cctor=window.ignore;
+  SC$1.$cctor=Global.ignore;
  });
 }());
