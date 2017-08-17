@@ -41,7 +41,7 @@ and [<JavaScript>] Panel =
         Element:Var<Dom.Element>
         Relayout:Panel->unit
         PannelAttrs:seq<Attr>
-        IsWithTitle : bool
+        IsWithTitle : Var<bool>
         TitleAttrs:seq<Attr>
         TitleContent:Doc
         TitleButtons:list<TitleButton>
@@ -61,7 +61,7 @@ and [<JavaScript>] Panel =
             Element=Var.Create null
             Relayout = (fun _ ->())
             PannelAttrs = []
-            IsWithTitle = true
+            IsWithTitle = Var.Create true
             TitleAttrs =  [Attr.Class "panelTitle"]
             TitleContent = div[]
             TitleButtons = []
@@ -176,9 +176,11 @@ and [<JavaScript>] Panel =
                      tableAttr [] [
                          tr[
                              tdAttr attrWidth [
-                                 (if x.IsWithTitle then
-                                    divAttr titleAttrsUpdated [titleContentUpdated]
-                                  else div[])]
+                                  x.IsWithTitle.View |> View.Map(fun is -> 
+                                                                     if is then
+                                                                        divAttr titleAttrsUpdated [titleContentUpdated]
+                                                                      else div[]) |> Doc.EmbedView
+                                               ]
                           ]
                          tr[
                              tdAttr [] [

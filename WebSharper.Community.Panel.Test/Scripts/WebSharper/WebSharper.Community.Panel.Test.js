@@ -85,11 +85,13 @@
    return!Client.isExpanded().c?"none":"block";
   },Client.isExpanded().v)),AttrModule.Style("color","White"),AttrModule.Style("margin-left","15px"),AttrModule.Style("Width","75px")],[Doc.TextNode("Dialog")])]),Doc.Element("tr",[],[Doc.Element("td",[],[Helper.IconNormal("add",function()
   {
-   var z_index,childPanelContainer,contentItems,titleVar,panel;
+   var z_index,childPanelContainer,contentItems,childPanel,titleVar,panel;
    z_index=List.ofSeq(Client.panelContainer().PanelItems).get_Length()+1;
    childPanelContainer=PanelContainer.get_Create().WithLayoutManager(LayoutManagers.StackPanelLayoutManager());
    contentItems=ContentModel.get_Create();
-   childPanelContainer.AddPanel(Panel$1.get_Create().WithTitle(false).WithPannelAttrs([AttrModule.Class("panelContent")]).WithPanelContent(contentItems.get_Render()).WithWidth(150).WithHeight(150));
+   childPanel=Panel$1.get_Create().WithPannelAttrs([AttrModule.Class("panelContent")]).WithPanelContent(contentItems.get_Render()).WithWidth(150).WithHeight(150);
+   Var.Set(childPanel.IsWithTitle,false);
+   childPanelContainer.AddPanel(childPanel);
    titleVar=Var.Create$1("Panel "+Global.String(z_index));
    panel=Panel$1.get_Create().WithPannelAttrs([AttrModule.Style("position","absolute")]).WithTitleContent(Doc.TextView(titleVar.v)).WithTitleButtons(List.ofArray([TitleButton.New("add",function()
    {
