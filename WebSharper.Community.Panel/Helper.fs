@@ -23,3 +23,13 @@ module Helper =
 
     let UniqueKey() = System.Guid.NewGuid().ToString()
 
+    let MoveItemInModelList<'a  when 'a : equality> (items:ListModel<Key,'a>) isDown  item = 
+        let listItems = items |>List.ofSeq
+        let index = listItems |> List.findIndex (fun entry -> entry = item)
+        let targetIndex = if isDown then index + 1 else index - 1
+        if targetIndex >= 0 && targetIndex < listItems.Length then
+            items.Clear()
+            let (first,second) = listItems |> List.filter (fun entry -> entry <> item) |> List.splitAt targetIndex
+            first@(item::second) |> List.iter (fun entry -> items.Add(entry))
+            first |> List.iter (fun entry -> items.Add(entry))
+
