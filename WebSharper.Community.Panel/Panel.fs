@@ -8,6 +8,21 @@ open WebSharper.UI.Next.Html
 open WebSharper.Community.PropertyGrid
 
 [<JavaScript>]
+type PanelData =
+    {
+        Key:string
+        Left:double
+        Top:double
+        Children:PanelData list
+    }
+    static member Create key left top children=
+        {
+            Key=key
+            Left=left
+            Top=top
+            Children = children
+        }
+[<JavaScript>]
 type TitleButton =
     {
         Icon:string
@@ -26,7 +41,7 @@ and [<JavaScript>] Panel =
         Element:Var<Dom.Element>
         Relayout:Panel->unit
         PannelAttrs:seq<Attr>
-        IsWithTitle : bool
+        IsWithTitle : Var<bool>
         TitleAttrs:seq<Attr>
         TitleContent:Doc
         TitleButtons:list<TitleButton>
@@ -46,7 +61,7 @@ and [<JavaScript>] Panel =
             Element=Var.Create null
             Relayout = (fun _ ->())
             PannelAttrs = []
-            IsWithTitle = true
+            IsWithTitle = Var.Create true
             TitleAttrs =  [Attr.Class "panelTitle"]
             TitleContent = div[]
             TitleButtons = []
@@ -56,6 +71,7 @@ and [<JavaScript>] Panel =
             onAfterRender=(fun (_) ->())
             Properties = []
         }
+    member x.WithKey key = {x with Key=key}
     member x.WithPannelAttrs attrs = {x with PannelAttrs=attrs}
     member x.WithTitleAttrs attrs = {x with TitleAttrs=attrs}
     member x.WithTitleContent content = {x with TitleContent=content}
@@ -75,6 +91,8 @@ and [<JavaScript>] Panel =
                         x.Children.PanelItems |>List.ofSeq |> List.map (fun childPanel -> childPanel.Properties) |> List.concat
                         ]
                 |> propGrid.Edit
+    member x.PanelData = PanelData.Create x.Key x.Left.Value x.Top.Value 
+                                          (x.Children.PanelItems |>List.ofSeq |>List.map (fun panel -> panel.PanelData))
     member x.Render =
         let dragActive = Var.Create false
         let mouseOverVar = Var.Create false
@@ -158,9 +176,11 @@ and [<JavaScript>] Panel =
                      tableAttr [] [
                          tr[
                              tdAttr attrWidth [
-                                 (if x.IsWithTitle then
-                                    divAttr titleAttrsUpdated [titleContentUpdated]
-                                  else div[])]
+                                  x.IsWithTitle.View |> View.Map(fun is -> 
+                                                                     if is then
+                                                                        divAttr titleAttrsUpdated [titleContentUpdated]
+                                                                      else div[]) |> Doc.EmbedView
+                                               ]
                           ]
                          tr[
                              tdAttr [] [

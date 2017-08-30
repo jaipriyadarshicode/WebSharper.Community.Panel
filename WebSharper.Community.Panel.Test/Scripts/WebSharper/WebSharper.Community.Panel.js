@@ -1,34 +1,78 @@
 (function()
 {
  "use strict";
- var WebSharper,Community,Panel,Helper,TitleButton,Panel$1,PanelContainer,Rect,LayoutManagers,SC$1,Dialog,UI,Next,Doc,List,AttrModule,IntelliFactory,Runtime,Var,Unchecked,View,Input,Mouse,Seq,Guid,ListModel,console;
- WebSharper=window.WebSharper=window.WebSharper||{};
+ var Global,WebSharper,Community,Panel,Helper,WrapControlsAligment,WrapControls,PanelData,TitleButton,Panel$1,PanelContainer,Rect,LayoutManagers,SC$1,Dialog,List,Seq,Unchecked,Guid,UI,Next,Doc,AttrModule,Var,View,IntelliFactory,Runtime,Input,Mouse,ListModel,console;
+ Global=window;
+ WebSharper=Global.WebSharper=Global.WebSharper||{};
  Community=WebSharper.Community=WebSharper.Community||{};
  Panel=Community.Panel=Community.Panel||{};
  Helper=Panel.Helper=Panel.Helper||{};
+ WrapControlsAligment=Panel.WrapControlsAligment=Panel.WrapControlsAligment||{};
+ WrapControls=Panel.WrapControls=Panel.WrapControls||{};
+ PanelData=Panel.PanelData=Panel.PanelData||{};
  TitleButton=Panel.TitleButton=Panel.TitleButton||{};
  Panel$1=Panel.Panel=Panel.Panel||{};
  PanelContainer=Panel.PanelContainer=Panel.PanelContainer||{};
  Rect=Panel.Rect=Panel.Rect||{};
  LayoutManagers=Panel.LayoutManagers=Panel.LayoutManagers||{};
- SC$1=window.StartupCode$WebSharper_Community_Panel$LayoutManagers=window.StartupCode$WebSharper_Community_Panel$LayoutManagers||{};
+ SC$1=Global.StartupCode$WebSharper_Community_Panel$LayoutManagers=Global.StartupCode$WebSharper_Community_Panel$LayoutManagers||{};
  Dialog=Panel.Dialog=Panel.Dialog||{};
+ List=WebSharper&&WebSharper.List;
+ Seq=WebSharper&&WebSharper.Seq;
+ Unchecked=WebSharper&&WebSharper.Unchecked;
+ Guid=WebSharper&&WebSharper.Guid;
  UI=WebSharper&&WebSharper.UI;
  Next=UI&&UI.Next;
  Doc=Next&&Next.Doc;
- List=WebSharper&&WebSharper.List;
  AttrModule=Next&&Next.AttrModule;
- IntelliFactory=window.IntelliFactory;
- Runtime=IntelliFactory&&IntelliFactory.Runtime;
  Var=Next&&Next.Var;
- Unchecked=WebSharper&&WebSharper.Unchecked;
  View=Next&&Next.View;
+ IntelliFactory=Global.IntelliFactory;
+ Runtime=IntelliFactory&&IntelliFactory.Runtime;
  Input=Next&&Next.Input;
  Mouse=Input&&Input.Mouse;
- Seq=WebSharper&&WebSharper.Seq;
- Guid=WebSharper&&WebSharper.Guid;
  ListModel=Next&&Next.ListModel;
- console=window.console;
+ console=Global.console;
+ Helper.MoveItemInModelList=function(items,isDown,item)
+ {
+  var listItems,targetIndex,p,first;
+  listItems=List.ofSeq(items);
+  targetIndex=isDown?Seq.findIndex(function(entry)
+  {
+   return Unchecked.Equals(entry,item);
+  },listItems)+1:Seq.findIndex(function(entry)
+  {
+   return Unchecked.Equals(entry,item);
+  },listItems)-1;
+  targetIndex>=0&&targetIndex<listItems.get_Length()?(items.Clear(),p=List.splitAt(targetIndex,List.filter(function(entry)
+  {
+   return!Unchecked.Equals(entry,item);
+  },listItems)),first=p[0],List.iter(function(entry)
+  {
+   items.Append(entry);
+  },List.append(first,new List.T({
+   $:1,
+   $0:item,
+   $1:p[1]
+  }))),List.iter(function(entry)
+  {
+   items.Append(entry);
+  },first)):void 0;
+ };
+ Helper.UniqueKey=function()
+ {
+  var c;
+  c=Guid.NewGuid();
+  return Global.String(c);
+ };
+ Helper.TxtIconNormal=function(id,txt,action)
+ {
+  return Helper.TxtIcon("material-icons orange600",id,txt,action);
+ };
+ Helper.TxtIcon=function(className,id,txt,action)
+ {
+  return Doc.Element("div",Helper.AttrsClick(action),[Doc.Element("i",[AttrModule.Class(className)],[Doc.TextNode(id)]),Doc.TextNode(txt)]);
+ };
  Helper.IconSmall=function(id,action)
  {
   return Helper.Icon("material-icons orange600 small",id,action);
@@ -55,6 +99,41 @@
    };
   })]);
  };
+ WrapControlsAligment.Horizontal={
+  $:1
+ };
+ WrapControlsAligment.Vertical={
+  $:0
+ };
+ WrapControls.Render=function(icons,aligment,content)
+ {
+  var mouseOver,icons$1;
+  mouseOver=Var.Create$1(false);
+  icons$1=Doc.Element("div",[AttrModule.DynamicStyle("display",View.Map(function(value)
+  {
+   return!value?"none":"block";
+  },mouseOver.v))],icons);
+  return aligment.$==1?Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[content]),Doc.Element("td",[],[icons$1])])]).on("mouseenter",function()
+  {
+   return Var.Set(mouseOver,true);
+  }).on("mouseleave",function()
+  {
+   return Var.Set(mouseOver,false);
+  }):Doc.Element("div",[],[icons$1,content]);
+ };
+ PanelData.Create=function(key,left,top,children)
+ {
+  return PanelData.New(key,left,top,children);
+ };
+ PanelData.New=function(Key,Left,Top,Children)
+ {
+  return{
+   Key:Key,
+   Left:Left,
+   Top:Top,
+   Children:Children
+  };
+ };
  TitleButton=Panel.TitleButton=Runtime.Class({
   Render:function(panel)
   {
@@ -76,23 +155,44 @@
  Panel$1=Panel.Panel=Runtime.Class({
   get_Render:function()
   {
-   var $this,dragActive,mouseOverVar,leftOffset,topOffset,toLocal,a,titleAttrsUpdated,titleContentUpdated,attrWidth,resDiv,a$1,a$2;
+   var $this,dragActive,mouseOverVar,leftOffset,topOffset,toLocal,titleAttrsUpdated,titleContentUpdated,attrWidth,resDiv;
+   function a(x_cor,y_cor)
+   {
+    var domRectParent,domRectParentParent,maxX,maxY,xPos,b,a$3,b$1,yPos,b$2,a$4,b$3;
+    return dragActive.c?(domRectParent=$this.Element.c.getBoundingClientRect(),(domRectParentParent=$this.Element.c.parentElement.getBoundingClientRect(),(maxX=domRectParentParent.width-domRectParent.width,(maxY=domRectParentParent.height-domRectParent.height,(xPos=(b=(a$3=0,(b$1=+x_cor-leftOffset.c,Unchecked.Compare(a$3,b$1)===1?a$3:b$1)),Unchecked.Compare(maxX,b)===-1?maxX:b),(yPos=(b$2=(a$4=0,(b$3=+y_cor-topOffset.c,Unchecked.Compare(a$4,b$3)===1?a$4:b$3)),Unchecked.Compare(maxY,b$2)===-1?maxY:b$2),(Var.Set($this.Left,xPos),Var.Set($this.Top,yPos),$this.Relayout($this),[xPos,yPos]))))))):[$this.Left.c,$this.Top.c];
+   }
+   function a$1(x,y)
+   {
+    return(function($1)
+    {
+     return function($2)
+     {
+      return $1($2.toFixed(6)+"px");
+     };
+    }(Global.id))(x);
+   }
+   function a$2(x,y)
+   {
+    return(function($1)
+    {
+     return function($2)
+     {
+      return $1($2.toFixed(6)+"px");
+     };
+    }(Global.id))(y);
+   }
    $this=this;
    dragActive=Var.Create$1(false);
    mouseOverVar=Var.Create$1(false);
    leftOffset=Var.Create$1(0);
    topOffset=Var.Create$1(0);
-   toLocal=(a=function(x_cor,y_cor)
-   {
-    var domRectParent,domRectParentParent,maxX,maxY,xPos,b,a$3,b$1,yPos,b$2,a$4,b$3;
-    return dragActive.c?(domRectParent=$this.Element.c.getBoundingClientRect(),(domRectParentParent=$this.Element.c.parentElement.getBoundingClientRect(),(maxX=domRectParentParent.width-domRectParent.width,(maxY=domRectParentParent.height-domRectParent.height,(xPos=(b=(a$3=0,(b$1=+x_cor-leftOffset.c,Unchecked.Compare(a$3,b$1)===1?a$3:b$1)),Unchecked.Compare(maxX,b)===-1?maxX:b),(yPos=(b$2=(a$4=0,(b$3=+y_cor-topOffset.c,Unchecked.Compare(a$4,b$3)===1?a$4:b$3)),Unchecked.Compare(maxY,b$2)===-1?maxY:b$2),(Var.Set($this.Left,xPos),Var.Set($this.Top,yPos),$this.Relayout($this),[xPos,yPos]))))))):[$this.Left.c,$this.Top.c];
-   },View.Map(function($1)
+   toLocal=View.Map(function($1)
    {
     return a($1[0],$1[1]);
    },View.UpdateWhile([0,0],View.Map(function(v)
    {
     return v&&dragActive.c;
-   },Mouse.get_LeftPressed()),Mouse.get_Position())));
+   },Mouse.get_LeftPressed()),Mouse.get_Position()));
    titleAttrsUpdated=Seq.concat([this.TitleAttrs,List.ofArray([AttrModule.Style("cursor","grab"),AttrModule.Handler("mouseenter",function()
    {
     return function()
@@ -131,14 +231,14 @@
     {
      return $1($2.toFixed(6)+"px");
     };
-   }(window.id))(this.Width))]):List.T.Empty;
+   }(Global.id))(this.Width))]):List.T.Empty;
    resDiv=Doc.Element("div",Seq.concat([this.PannelAttrs,Seq.concat([attrWidth,this.Height>0?List.ofArray([AttrModule.Style("height",(function($1)
    {
     return function($2)
     {
      return $1($2.toFixed(6)+"px");
     };
-   }(window.id))(this.Height))]):List.T.Empty]),List.ofArray([AttrModule.DynamicStyle("left",View.Map(function(x)
+   }(Global.id))(this.Height))]):List.T.Empty]),List.ofArray([AttrModule.DynamicStyle("left",View.Map(function(x)
    {
     return(function($1)
     {
@@ -146,32 +246,14 @@
      {
       return $1($2.toFixed(6)+"px");
      };
-    }(window.id))(x);
-   },this.Left.v)),AttrModule.DynamicStyle("left",(a$1=function(x)
-   {
-    return(function($1)
-    {
-     return function($2)
-     {
-      return $1($2.toFixed(6)+"px");
-     };
-    }(window.id))(x);
-   },View.Map(function($1)
+    }(Global.id))(x);
+   },this.Left.v)),AttrModule.DynamicStyle("left",View.Map(function($1)
    {
     return a$1($1[0],$1[1]);
-   },toLocal))),AttrModule.DynamicStyle("top",(a$2=function(x,y)
-   {
-    return(function($1)
-    {
-     return function($2)
-     {
-      return $1($2.toFixed(6)+"px");
-     };
-    }(window.id))(y);
-   },View.Map(function($1)
+   },toLocal)),AttrModule.DynamicStyle("top",View.Map(function($1)
    {
     return a$2($1[0],$1[1]);
-   },toLocal))),AttrModule.DynamicStyle("top",View.Map(function(y)
+   },toLocal)),AttrModule.DynamicStyle("top",View.Map(function(y)
    {
     return(function($1)
     {
@@ -179,13 +261,23 @@
      {
       return $1($2.toFixed(6)+"px");
      };
-    }(window.id))(y);
-   },this.Top.v))])]),[Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",attrWidth,[this.IsWithTitle?Doc.Element("div",titleAttrsUpdated,[titleContentUpdated]):Doc.Element("div",[],[])])]),Doc.Element("tr",[],[Doc.Element("td",[],[this.PanelContent,this.Children.get_Render()])])])]);
+    }(Global.id))(y);
+   },this.Top.v))])]),[Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",attrWidth,[Doc.EmbedView(View.Map(function(is)
+   {
+    return is?Doc.Element("div",titleAttrsUpdated,[titleContentUpdated]):Doc.Element("div",[],[]);
+   },this.IsWithTitle.v))])]),Doc.Element("tr",[],[Doc.Element("td",[],[this.PanelContent,this.Children.get_Render()])])])]);
    Var.Set(this.Element,resDiv.elt);
    return resDiv.OnAfterRender(function()
    {
     $this.onAfterRender($this);
    });
+  },
+  get_PanelData:function()
+  {
+   return PanelData.Create(this.Key,this.Left.c,this.Top.c,List.map(function(panel)
+   {
+    return panel.get_PanelData();
+   },List.ofSeq(this.Children.PanelItems)));
   },
   EditProperties:function(propGrid)
   {
@@ -245,16 +337,16 @@
   WithPannelAttrs:function(attrs)
   {
    return Panel$1.New(this.Key,this.Left,this.Top,this.Width,this.Height,this.Element,this.Relayout,attrs,this.IsWithTitle,this.TitleAttrs,this.TitleContent,this.TitleButtons,this.PanelContent,this.Children,this.InternalName,this.onAfterRender,this.Properties);
+  },
+  WithKey:function(key)
+  {
+   return Panel$1.New(key,this.Left,this.Top,this.Width,this.Height,this.Element,this.Relayout,this.PannelAttrs,this.IsWithTitle,this.TitleAttrs,this.TitleContent,this.TitleButtons,this.PanelContent,this.Children,this.InternalName,this.onAfterRender,this.Properties);
   }
  },null,Panel$1);
  Panel$1.get_Create=function()
  {
   var c;
-  return Panel$1.New((c=Guid.NewGuid(),window.String(c)),Var.Create$1(0),Var.Create$1(0),0,0,Var.Create$1(null),function()
-  {
-  },List.T.Empty,true,List.ofArray([AttrModule.Class("panelTitle")]),Doc.Element("div",[],[]),List.T.Empty,Doc.Element("div",[],[]),PanelContainer.get_Create(),"",function()
-  {
-  },List.T.Empty);
+  return Panel$1.New((c=Guid.NewGuid(),Global.String(c)),Var.Create$1(0),Var.Create$1(0),0,0,Var.Create$1(null),Global.ignore,List.T.Empty,Var.Create$1(true),List.ofArray([AttrModule.Class("panelTitle")]),Doc.Element("div",[],[]),List.T.Empty,Doc.Element("div",[],[]),PanelContainer.get_Create(),"",Global.ignore,List.T.Empty);
  };
  Panel$1.New=function(Key,Left,Top,Width,Height,Element,Relayout,PannelAttrs,IsWithTitle,TitleAttrs,TitleContent,TitleButtons,PanelContent,Children,InternalName,onAfterRender,Properties)
  {
@@ -289,13 +381,13 @@
     {
      return $1($2.toFixed(6)+"px");
     };
-   }(window.id))(this.Width))]):List.T.Empty,this.Height>0?List.ofArray([AttrModule.Style("height",(function($1)
+   }(Global.id))(this.Width))]):List.T.Empty,this.Height>0?List.ofArray([AttrModule.Style("height",(function($1)
    {
     return function($2)
     {
      return $1($2.toFixed(6)+"px");
     };
-   }(window.id))(this.Height))]):List.T.Empty,List.ofArray([AttrModule.Style("position","relative")])]),[Doc.ConvertBy(function(m)
+   }(Global.id))(this.Height))]):List.T.Empty,List.ofArray([AttrModule.Style("position","relative")])]),[Doc.ConvertBy(function(m)
    {
     return m.Key;
    },function(item)
@@ -367,7 +459,7 @@
  Rect=Panel.Rect=Runtime.Class({
   toString:function()
   {
-   return"left:"+window.String(this.left)+" "+" top:"+window.String(this.top)+" right:"+window.String(this.right)+" bottom:"+window.String(this.bottom);
+   return"left:"+Global.String(this.left)+" "+" top:"+Global.String(this.top)+" right:"+Global.String(this.right)+" bottom:"+Global.String(this.bottom);
   },
   inflate:function(width,height)
   {
@@ -558,7 +650,7 @@
     return null;
    }
   };
-  SC$1.$cctor=window.ignore;
+  SC$1.$cctor=Global.ignore;
  });
  Dialog=Panel.Dialog=Runtime.Class({
   get_Render:function()
@@ -568,7 +660,7 @@
    return Doc.Element("div",[AttrModule.Style("position","absolute"),AttrModule.Style("left","50%"),AttrModule.Style("top","50%"),AttrModule.Style("z-index","1"),AttrModule.Style("background-color","white"),AttrModule.Style("min-height","100px"),AttrModule.Style("min-width","200px"),AttrModule.DynamicStyle("display",View.Map(function(isVis)
    {
     return isVis?"block":"none";
-   },this.Visibility.v))],[Doc.Element("table",[AttrModule.Style("background-color","grey"),AttrModule.Style("display","block"),AttrModule.Style("min-height","100px"),AttrModule.Style("min-width","200px")],[Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[AttrModule.Style("border-style","hidden"),AttrModule.Style("background","#404040"),AttrModule.Style("color","rgb(200,200,200)"),AttrModule.Style("padding","0px 2px 5px 2px"),AttrModule.Style("Width","200px"),AttrModule.Style("font-size","medium")],[Doc.TextView(this.Title.v)])])]),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[AttrModule.Style("padding","5px 0px 0px 2px")],[Doc.BindView(window.id,this.Content.v)])]),Doc.Element("tr",[],[Doc.Element("td",[AttrModule.Style("padding","20px 12px 2px 20px")],[Doc.Element("button",[AttrModule.Style("border-radius","2px"),AttrModule.Handler("click",function()
+   },this.Visibility.v))],[Doc.Element("table",[AttrModule.Style("background-color","grey"),AttrModule.Style("display","block"),AttrModule.Style("min-height","100px"),AttrModule.Style("min-width","200px")],[Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[AttrModule.Style("border-style","hidden"),AttrModule.Style("background","#404040"),AttrModule.Style("color","rgb(200,200,200)"),AttrModule.Style("padding","0px 2px 5px 2px"),AttrModule.Style("Width","200px"),AttrModule.Style("font-size","medium")],[Doc.TextView(this.Title.v)])])]),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[AttrModule.Style("padding","5px 0px 0px 2px")],[Doc.BindView(Global.id,this.Content.v)])]),Doc.Element("tr",[],[Doc.Element("td",[AttrModule.Style("padding","20px 12px 2px 20px")],[Doc.Element("button",[AttrModule.Style("border-radius","2px"),AttrModule.Handler("click",function()
    {
     return function()
     {
@@ -593,9 +685,7 @@
  },null,Dialog);
  Dialog.get_Create=function()
  {
-  return Dialog.New(Var.Create$1(""),Var.Create$1(Doc.Element("div",[],[])),Var.Create$1(false),Var.Create$1(function()
-  {
-  }));
+  return Dialog.New(Var.Create$1(""),Var.Create$1(Doc.Element("div",[],[])),Var.Create$1(false),Var.Create$1(Global.ignore));
  };
  Dialog.New=function(Title,Content,Visibility,OKCallback)
  {

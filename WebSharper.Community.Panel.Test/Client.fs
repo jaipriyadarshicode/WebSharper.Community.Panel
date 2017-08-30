@@ -67,11 +67,12 @@ module Client =
                                                                                                            .WithLayoutManager(LayoutManagers.StackPanelLayoutManager)
                                                                    let contentItems=ContentModel.Create
                                                                    let childPanel=Panel.Create
-                                                                                       .WithTitle(false)
+                                                                                       //.WithTitle(false)
                                                                                        .WithPannelAttrs([Attr.Class "panelContent"])
                                                                                        .WithPanelContent(contentItems.Render)
                                                                                        .WithWidth(150.0)
                                                                                        .WithHeight(150.0)
+                                                                   childPanel.IsWithTitle.Value <- false
                                                                    childPanelContainer.AddPanel childPanel
                                                                    let titleVar=Var.Create ("Panel "+z_index.ToString())
                                                                    let panel=Panel.Create
