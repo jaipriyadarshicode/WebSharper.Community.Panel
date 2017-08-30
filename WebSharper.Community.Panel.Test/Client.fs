@@ -38,6 +38,12 @@ module Client =
     let propertyGrid = PropertyGrid.Create
     let dlg = Dialog.Create
     let isExpanded = Var.Create false
+    let transTime = 300.0
+    let trans = Anim.Simple Interpolation.Double Easing.CubicInOut transTime
+    let TransTransition = 
+          Trans.Create trans
+          |> Trans.Enter (fun _ -> trans 0.0 0.0)
+          |> Trans.Exit (fun _ -> trans 0.0 0.0)
     let Main () =
       div[
        divAttr[Attr.DynamicStyle "pointer-events" (View.Map (fun _ -> if dlg.Visibility.Value then "none" else "auto") dlg.Visibility.View)
@@ -46,18 +52,15 @@ module Client =
          [
             table[
                 tr[
-                    tdAttr [Attr.Style "vertical-align" "top"
-                            Attr.DynamicStyle "Width" (View.Map (fun isExpanded -> if isExpanded then "100px" else "0px") isExpanded.View)
-                           ][
-                        table
+                    tdAttr [Attr.Style "vertical-align" "top"]
+                      [
+                        tableAttr[Attr.AnimatedStyle "width" TransTransition (View.Map(fun isExpand -> if isExpanded.Value then 100.0 else 0.0) isExpanded.View) (fun x -> (string x) + "px")]
                              [
                                 tr[td[Helper.IconNormal "dehaze" (fun _ -> if not isExpanded.Value then isExpanded.Value <- true else isExpanded.Value <- false) ]]
                                 tr[
                                     td[Helper.IconNormal "announcement" (fun _ -> dlg.ShowDialog "Dialog title" (div[text "Content"]) (fun () -> ()))]
-                                    tdAttr[Attr.DynamicStyle "display" (View.Map (fun _ -> if not (isExpanded.Value) then "none" else "block") isExpanded.View)
+                                    tdAttr[Attr.DynamicStyle "display" (View.Map (fun value -> if not value then "none" else "block") isExpanded.View)
                                            Attr.Style "color" "White"
-                                           Attr.Style "margin-left" "15px"
-                                           Attr.Style "Width" "75px"
                                           ][text "Dialog"]
 
                                   ]
@@ -98,10 +101,8 @@ module Client =
                                                                    panelContainer.AddPanel panel
                                                                    )]
                                       
-                                   tdAttr[Attr.DynamicStyle "display" (View.Map (fun _ -> if not (isExpanded.Value) then "none" else "block") isExpanded.View)
+                                   tdAttr[Attr.DynamicStyle "display" (View.Map (fun value -> if not value then "none" else "block") isExpanded.View)
                                           Attr.Style "color" "White"
-                                          Attr.Style "margin-left" "15px"
-                                          Attr.Style "Width" "75px"
                                           ][text "Add Panel"]
                                     ]
                              ]
