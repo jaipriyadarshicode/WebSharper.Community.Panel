@@ -10,6 +10,7 @@ open WebSharper.Community.Panel
 open WebSharper.Community.PropertyGrid
 
 [<JavaScript>]
+[<Require(typeof<WebSharper.Community.PropertyGrid.Resources.StyleResource>)>]
 module Client =
 
     let panelContainer=PanelContainer.Create
