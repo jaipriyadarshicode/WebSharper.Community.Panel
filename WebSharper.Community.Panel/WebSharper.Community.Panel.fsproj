@@ -48,6 +48,15 @@
     </Otherwise>
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
+  <Import Project="..\packages\Zafir.FSharp.4.0.187.90-beta10\build\Zafir.FSharp.targets" Condition="Exists('..\packages\Zafir.FSharp.4.0.187.90-beta10\build\Zafir.FSharp.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Zafir.FSharp.4.0.187.90-beta10\build\Zafir.FSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zafir.FSharp.4.0.187.90-beta10\build\Zafir.FSharp.targets'))" />
+    <Error Condition="!Exists('..\packages\Zafir.UI.Next.4.0.167.77-beta10\build\Zafir.UI.Next.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zafir.UI.Next.4.0.167.77-beta10\build\Zafir.UI.Next.targets'))" />
+  </Target>
+  <Import Project="..\packages\Zafir.UI.Next.4.0.167.77-beta10\build\Zafir.UI.Next.targets" Condition="Exists('..\packages\Zafir.UI.Next.4.0.167.77-beta10\build\Zafir.UI.Next.targets')" />
   <ItemGroup>
     <Compile Include="Helper.fs" />
     <Compile Include="WrapControls.fs" />
@@ -55,6 +64,8 @@
     <Compile Include="Rect.fs" />
     <Compile Include="LayoutManagers.fs" />
     <Compile Include="Dialog.fs" />
+    <EmbeddedResource Include="Content\Panel.css" />
+    <Compile Include="Resources.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -141,13 +152,4 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
-  <Import Project="..\packages\Zafir.FSharp.4.0.187.90-beta10\build\Zafir.FSharp.targets" Condition="Exists('..\packages\Zafir.FSharp.4.0.187.90-beta10\build\Zafir.FSharp.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Zafir.FSharp.4.0.187.90-beta10\build\Zafir.FSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zafir.FSharp.4.0.187.90-beta10\build\Zafir.FSharp.targets'))" />
-    <Error Condition="!Exists('..\packages\Zafir.UI.Next.4.0.167.77-beta10\build\Zafir.UI.Next.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zafir.UI.Next.4.0.167.77-beta10\build\Zafir.UI.Next.targets'))" />
-  </Target>
-  <Import Project="..\packages\Zafir.UI.Next.4.0.167.77-beta10\build\Zafir.UI.Next.targets" Condition="Exists('..\packages\Zafir.UI.Next.4.0.167.77-beta10\build\Zafir.UI.Next.targets')" />
 </Project>
