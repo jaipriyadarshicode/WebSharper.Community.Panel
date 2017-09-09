@@ -16,8 +16,11 @@ module Helper =
     let IconSmall id action = Icon "material-icons orange600 small" id action
 
     let TxtIcon className id txt action = divAttr(AttrsClick action)[
-                                                iAttr[Attr.Class className][text id]
-                                                text txt 
+                                                table[
+                                                    tr[td[iAttr[Attr.Class className][text id]]
+                                                       tdAttr[Attr.Style "vertical-align" "middle"][text txt] 
+                                                      ]
+                                                ]
                                               ]:>Doc
     let TxtIconNormal id txt action = TxtIcon "material-icons orange600" id txt action
 
