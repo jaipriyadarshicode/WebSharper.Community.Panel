@@ -47,6 +47,12 @@ module Client =
           |> Trans.Enter (fun _ -> trans 0.0 0.0)
           |> Trans.Exit (fun _ -> trans 0.0 0.0)
     let Main () =
+      let animAttr param unit= Attr.AnimatedStyle param TransTransition (View.Map(fun isExpand -> if isExpanded.Value then 100.0 else 0.0) isExpanded.View) (fun x -> (string x) + unit)  
+      let animText txt = tdAttr [Attr.Style "vertical-align" "middle"
+                                 Attr.Style "color" "White"
+                                 Attr.DynamicStyle "visibility" (View.Map (fun isExpand -> if isExpand then "visible" else "hidden") isExpanded.View)
+                                 animAttr "font-size" "%"][text txt]
+
       div[
        divAttr[Attr.DynamicStyle "pointer-events" (View.Map (fun _ -> if dlg.Visibility.Value then "none" else "auto") dlg.Visibility.View)
                Attr.DynamicStyle "opacity" (View.Map(fun _ -> if dlg.Visibility.Value then "0.5" else "1" ) dlg.Visibility.View)
@@ -56,15 +62,12 @@ module Client =
                 tr[
                     tdAttr [Attr.Style "vertical-align" "top"]
                       [
-                        tableAttr[Attr.AnimatedStyle "width" TransTransition (View.Map(fun isExpand -> if isExpanded.Value then 100.0 else 0.0) isExpanded.View) (fun x -> (string x) + "px")]
+                        tableAttr[(animAttr "width" "px")]
                              [
                                 tr[td[Helper.IconNormal "dehaze" (fun _ -> if not isExpanded.Value then isExpanded.Value <- true else isExpanded.Value <- false) ]]
                                 tr[
                                     td[Helper.IconNormal "announcement" (fun _ -> dlg.ShowDialog "Dialog title" (div[text "Content"]) (fun () -> ()))]
-                                    tdAttr[Attr.DynamicStyle "display" (View.Map (fun value -> if not value then "none" else "block") isExpanded.View)
-                                           Attr.Style "color" "White"
-                                          ][text "Dialog"]
-
+                                    animText "Dialog"
                                   ]
                                 tr[td[Helper.IconNormal "add"
                                                            (fun _->let z_index=(panelContainer.PanelItems |>List.ofSeq).Length + 1
@@ -102,10 +105,7 @@ module Client =
                                                                                                   ])
                                                                    panelContainer.AddPanel panel
                                                                    )]
-                                      
-                                   tdAttr[Attr.DynamicStyle "display" (View.Map (fun value -> if not value then "none" else "block") isExpanded.View)
-                                          Attr.Style "color" "White"
-                                          ][text "Add Panel"]
+                                   animText "Add Panel"
                                     ]
                              ]
                         table[
