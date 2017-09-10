@@ -64,19 +64,30 @@
  };
  Client.Main=function()
  {
+  function animAttr(param,unit)
+  {
+   return AttrModule.AnimatedStyle(param,Client.TransTransition(),View.Map(function()
+   {
+    return Client.isExpanded().c?100:0;
+   },Client.isExpanded().v),function(x)
+   {
+    return Global.String(x)+unit;
+   });
+  }
+  function animText(txt)
+  {
+   return Doc.Element("td",[AttrModule.Style("vertical-align","middle"),AttrModule.Style("color","White"),AttrModule.DynamicStyle("visibility",View.Map(function(isExpand)
+   {
+    return isExpand?"visible":"hidden";
+   },Client.isExpanded().v)),animAttr("font-size","%")],[Doc.TextNode(txt)]);
+  }
   return Doc.Element("div",[],[Doc.Element("div",[AttrModule.DynamicStyle("pointer-events",View.Map(function()
   {
    return Client.dlg().Visibility.c?"none":"auto";
   },Client.dlg().Visibility.v)),AttrModule.DynamicStyle("opacity",View.Map(function()
   {
    return Client.dlg().Visibility.c?"0.5":"1";
-  },Client.dlg().Visibility.v))],[Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[AttrModule.Style("vertical-align","top")],[Doc.Element("table",[AttrModule.AnimatedStyle("width",Client.TransTransition(),View.Map(function()
-  {
-   return Client.isExpanded().c?100:0;
-  },Client.isExpanded().v),function(x)
-  {
-   return Global.String(x)+"px";
-  })],[Doc.Element("tr",[],[Doc.Element("td",[],[Helper.IconNormal("dehaze",function()
+  },Client.dlg().Visibility.v))],[Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[AttrModule.Style("vertical-align","top")],[Doc.Element("table",[animAttr("width","px")],[Doc.Element("tr",[],[Doc.Element("td",[],[Helper.IconNormal("dehaze",function()
   {
    if(!Client.isExpanded().c)
     Var.Set(Client.isExpanded(),true);
@@ -87,10 +98,7 @@
    var a;
    a=Doc.Element("div",[],[Doc.TextNode("Content")]);
    Client.dlg().ShowDialog("Dialog title",a,Global.ignore);
-  })]),Doc.Element("td",[AttrModule.DynamicStyle("display",View.Map(function(value)
-  {
-   return!value?"none":"block";
-  },Client.isExpanded().v)),AttrModule.Style("color","White")],[Doc.TextNode("Dialog")])]),Doc.Element("tr",[],[Doc.Element("td",[],[Helper.IconNormal("add",function()
+  })]),animText("Dialog")]),Doc.Element("tr",[],[Doc.Element("td",[],[Helper.IconNormal("add",function()
   {
    var z_index,childPanelContainer,contentItems,childPanel,titleVar,panel;
    z_index=List.ofSeq(Client.panelContainer().PanelItems).get_Length()+1;
@@ -113,10 +121,7 @@
     Client.panelContainer().PanelItems.Remove(Client.panelContainer().FindPanelItem(panel$1));
    })])).WithChildPanelContainer(childPanelContainer).WithWidth(150).WithProperties(List.ofArray([Properties.string("title1",titleVar)]));
    Client.panelContainer().AddPanel(panel);
-  })]),Doc.Element("td",[AttrModule.DynamicStyle("display",View.Map(function(value)
-  {
-   return!value?"none":"block";
-  },Client.isExpanded().v)),AttrModule.Style("color","White")],[Doc.TextNode("Add Panel")])])]),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Client.propertyGrid().get_Render()])])])]),Doc.Element("td",[],[Client.panelContainer().get_Render()])])])]),Doc.Element("div",[],[Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Client.dlg().get_Render()])])])])]);
+  })]),animText("Add Panel")])]),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Client.propertyGrid().get_Render()])])])]),Doc.Element("td",[],[Client.panelContainer().get_Render()])])])]),Doc.Element("div",[],[Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Client.dlg().get_Render()])])])])]);
  };
  Client.TransTransition=function()
  {
@@ -153,9 +158,10 @@
   SC$1.$cctor();
   return SC$1.panelContainer;
  };
- SC$1.$cctor=Runtime.Cctor(function()
+ SC$1.$cctor=function()
  {
   var a,a$1,a$2;
+  SC$1.$cctor=Global.ignore;
   SC$1.panelContainer=PanelContainer.get_Create().WithWidth(800).WithHeight(400).WithLayoutManager(LayoutManagers.FloatingPanelLayoutManager(5)).WithAttributes([AttrModule.Style("border","1px solid white")]);
   SC$1.propertyGrid=PropertyGrid$1.get_Create();
   SC$1.dlg=Dialog.get_Create();
@@ -172,6 +178,5 @@
   {
    return((Client.trans())($1))($2);
   })));
-  SC$1.$cctor=Global.ignore;
- });
+ };
 }());
