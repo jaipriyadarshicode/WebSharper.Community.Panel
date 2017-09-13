@@ -15,10 +15,11 @@ open WebSharper.Community.PropertyGrid
 module Client =
 
     let panelContainer=PanelContainer.Create
-                                     .WithWidth(800.0).WithHeight(400.0)
+                                     .WithWidth(1800.0).WithHeight(1400.0)
                                      .WithLayoutManager(LayoutManagers.FloatingPanelLayoutManager 5.0)
                                      //.WithLayoutManager(LayoutManagers.StackPanelLayoutManager)
-                                     .WithAttributes([Attr.Style "border" "1px solid white"])
+                                     .WithAttributes([//Attr.Style "border" "1px solid white"
+                                                     ])
     [<JavaScript>]
     type ContentItem=
         {
@@ -100,6 +101,7 @@ module Client =
                                                                                   //.WithPanelContent(divAttr[Attr.Class "panelContent"][text "Content"])
                                                                                   .WithChildPanelContainer(childPanelContainer)
                                                                                   .WithWidth(150.0)
+                                                                                  .WithInitialAutoLayout()
                                                                                   .WithProperties([
                                                                                                     Properties.string "title1" titleVar
                                                                                                   ])

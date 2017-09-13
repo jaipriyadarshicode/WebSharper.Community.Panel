@@ -42,7 +42,7 @@ module LayoutManagers =
         |>List.filter (fun item -> item.Key <> except.Key)
         |>List.fold (fun (acc:Rect list) panel -> 
                                 let rcPanel = panelRect panel 0.0
-                               // Console.Log ("collectFreeSpace: " + rcPanel.ToString())   
+                                //Console.Log ("collectFreeSpace: " + rcPanel.ToString())   
                                 let rcTop = {left = 0.0; right = rcContainer.right; top = 0.0; bottom = rcPanel.top }
                                 let rcLeft = {left = 0.0; right = rcPanel.left; top = 0.0; bottom = rcContainer.bottom }
                                 rcTop::rcLeft
@@ -57,7 +57,7 @@ module LayoutManagers =
     let movePanelToFreeSpace panelItems (panelItem:Panel) margin= 
         let rcPanel=Rect.fromPanel (panelItem)
         let rcContainer = Rect.fromDomRect (panelItem.Element.Value.ParentElement)
-       //Console.Log ("Add panel: " + rcPanel.ToString() + " " + rcContainer.ToString())       
+        //Console.Log ("Add panel: " + rcPanel.ToString() + " " + rcContainer.ToString())       
         let foundCandidate=
             collectFreeSpace panelItems rcContainer panelItem margin
             |>List.tryFind (fun rc -> 
@@ -89,8 +89,8 @@ module LayoutManagers =
             panelItems
             |>List.ofSeq
             |>List.tryFind (fun panelItem-> 
-                               // Console.Log("relayout:"+(Rect.fromPanel panelItem).ToString()+" "+(Rect.fromPanel exceptPanelItem).ToString())
-                                panelItem.Key <> exceptPanelItem.Key && not ((Rect.fromPanel panelItem).intersect (Rect.fromPanel exceptPanelItem)).isEmpty)
+                                //Console.Log("relayout:"+(Rect.fromPanel panelItem).ToString()+" "+(Rect.fromPanel exceptPanelItem).ToString())
+                                panelItem.Key <> exceptPanelItem.Key && ((Rect.fromPanel panelItem).intersect (Rect.fromPanel exceptPanelItem)).minSize > 15.0)
         match foundPanel with
         |None ->()
         |Some(panelItem) -> movePanelToFreeSpace panelItems panelItem margin  

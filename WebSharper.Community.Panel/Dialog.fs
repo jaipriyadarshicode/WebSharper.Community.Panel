@@ -29,8 +29,8 @@ type Dialog =
                                   x.OKCallback.Value <- okCallback
     member x.Render =
         divAttr[Attr.Style "position" "absolute"
-                Attr.Style "left" "50%"
-                Attr.Style "top" "50%"
+                Attr.Style "left" "250px"
+                Attr.Style "top" "200px"
                 Attr.Style "z-index" "1"
                 Attr.Style "background-color" "white";
                 Attr.Style "min-height" "100px";

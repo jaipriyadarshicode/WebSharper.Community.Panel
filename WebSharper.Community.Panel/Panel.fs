@@ -50,6 +50,7 @@ and [<JavaScript>] Panel =
         InternalName:string
         onAfterRender:Panel -> unit
         Properties : List<IProperty>
+        IsWithInitialAutoLayout :Var<bool>
     }
     static member Create =
         {   
@@ -70,6 +71,7 @@ and [<JavaScript>] Panel =
             InternalName=""
             onAfterRender=(fun (_) ->())
             Properties = []
+            IsWithInitialAutoLayout = Var.Create false
         }
     member x.WithKey key = {x with Key=key}
     member x.WithPannelAttrs attrs = {x with PannelAttrs=attrs}
@@ -85,6 +87,7 @@ and [<JavaScript>] Panel =
     member x.WithProperties properties = {x with Properties = properties}
     member x.WithWidth cx = {x with Width = cx } //Var.Create cx}
     member x.WithHeight cy = {x with Height = cy } //Var.Create cy}
+    member x.WithInitialAutoLayout() = {x with IsWithInitialAutoLayout = Var.Create true }
     member x.EditProperties (propGrid:PropertyGrid) = 
                 List.concat [
                         x.Properties
@@ -244,5 +247,9 @@ and [<JavaScript>] PanelContainer =
         divAttr attrsUpdated
                 [
                     ListModel.View x.PanelItems
-                    |> Doc.BindSeqCachedBy (fun m -> m.Key) (fun item -> (item.Render).OnAfterRender(fun el -> x.LayoutManager.PlacePanel x item))
+                    |> Doc.BindSeqCachedBy (fun m -> m.Key) (fun item -> (item.Render).OnAfterRender(fun el -> 
+                                                                                                        if item.IsWithInitialAutoLayout.Value then
+                                                                                                            x.LayoutManager.PlacePanel x item
+                                                                                                            item.IsWithInitialAutoLayout.Value <- false
+                                                                                                             ))
                 ]
