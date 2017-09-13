@@ -39,6 +39,7 @@ type Rect =
         {left=left;right=max left right;top=top;bottom = max top bottom}
     member x.width=x.right - x.left
     member x.height=x.bottom - x.top
+    member x.minSize = min x.width x.height
     member x.inflate width height =
         {left=x.left - width;top=x.top-height;right=x.right + width;bottom=x.bottom+height;}
     override x.ToString() = "left:"+x.left.ToString()+" "+ " top:"+x.top.ToString()+" right:"+x.right.ToString()+" bottom:"+x.bottom.ToString()

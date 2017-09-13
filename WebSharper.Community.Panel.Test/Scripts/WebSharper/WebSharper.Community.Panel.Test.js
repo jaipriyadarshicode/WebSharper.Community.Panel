@@ -119,7 +119,7 @@
    }),TitleButton.New("clear",function(panel$1)
    {
     Client.panelContainer().PanelItems.Remove(Client.panelContainer().FindPanelItem(panel$1));
-   })])).WithChildPanelContainer(childPanelContainer).WithWidth(150).WithProperties(List.ofArray([Properties.string("title1",titleVar)]));
+   })])).WithChildPanelContainer(childPanelContainer).WithWidth(150).WithInitialAutoLayout().WithProperties(List.ofArray([Properties.string("title1",titleVar)]));
    Client.panelContainer().AddPanel(panel);
   })]),animText("Add Panel")])]),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Client.propertyGrid().get_Render()])])])]),Doc.Element("td",[],[Client.panelContainer().get_Render()])])])]),Doc.Element("div",[],[Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Client.dlg().get_Render()])])])])]);
  };
@@ -162,7 +162,7 @@
  {
   var a,a$1,a$2;
   SC$1.$cctor=Global.ignore;
-  SC$1.panelContainer=PanelContainer.get_Create().WithWidth(800).WithHeight(400).WithLayoutManager(LayoutManagers.FloatingPanelLayoutManager(5)).WithAttributes([AttrModule.Style("border","1px solid white")]);
+  SC$1.panelContainer=PanelContainer.get_Create().WithWidth(1800).WithHeight(1400).WithLayoutManager(LayoutManagers.FloatingPanelLayoutManager(5)).WithAttributes([]);
   SC$1.propertyGrid=PropertyGrid$1.get_Create();
   SC$1.dlg=Dialog.get_Create();
   SC$1.isExpanded=Var.Create$1(false);
